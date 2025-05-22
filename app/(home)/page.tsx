@@ -2,14 +2,14 @@
 
 export default function Home() {
   return (
-    <div 
+    <div  
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to right, #6a11cb, #2575fc)",
-        color: "white",
+        background: '#F4F1EA',
+        color: "#1F2235",
         textAlign: "center",
         fontFamily:"cursive"
       }}

@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-gray-900 text-white py-8 ">
+    <footer className="bg-[#111] text-white py-8 ">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
         {/* Info & Socials */}
         <div className="flex flex-col justify-between">
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
             <p className="text-gray-300">Phone: +123 456 7890</p>
           </div>
           <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
+            <h3 className="text-lg font-semibold mb-3">Follow me</h3>
             <div className="flex gap-4">
               {/* Social Icons Here */}
               <a href="#" className="text-gray-400 hover:text-white">Facebook</a>
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">Pages</h2>
           <ul className="space-y-2">
 
-            <li><a href="/about" className="text-gray-300 hover:text-white">About Us</a></li>
+            <li><a href="/about" className="text-gray-300 hover:text-white">About</a></li>
             <li><a href="/services" className="text-gray-300 hover:text-white">Services</a></li>
             <li><a href="/contact" className="text-gray-300 hover:text-white">Contact</a></li>
             <li><a href="/privacy-policy" className="text-gray-300 hover:text-white">Privacy Policy</a></li>
@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
               type="text"
               name="name"
               placeholder="Your Name"
-              className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
+              className="w-full p-2 rounded bg-[#F4F1EA] text-black border border-gray-700 focus:bg-[#111] focus:outline-none focus:border-b-[#4a90e2] focus:shadow-[0_0_4px_rgba(74,144,226,0.5)] focus:text-white"
               value={formData.name}
               onChange={handleChange}
               required
@@ -98,7 +98,7 @@ const Footer: React.FC = () => {
               type="email"
               name="email"
               placeholder="Your Email"
-              className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
+              className="w-full p-2 rounded bg-[#F4F1EA] text-black border border-gray-700 focus:bg-[#111] focus:outline-none focus:border-b-[#4a90e2] focus:shadow-[0_0_4px_rgba(74,144,226,0.5)] focus:text-white"
               value={formData.email}
               onChange={handleChange}
               required
@@ -107,7 +107,7 @@ const Footer: React.FC = () => {
               name="message"
               placeholder="Your Message"
               rows={4}
-              className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
+              className="w-full p-2 rounded bg-[#F4F1EA] text-black border border-gray-700 focus:bg-[#111] focus:outline-none focus:border-b-[#4a90e2] focus:shadow-[0_0_4px_rgba(74,144,226,0.5)] focus:text-white"
               value={formData.message}
               onChange={handleChange}
               required
