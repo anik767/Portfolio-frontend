@@ -26,50 +26,51 @@ const Nav: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 mx-auto transition-transform duration-200  ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}
-    >
-      <nav className="flex justify-center bg-[#141414]/70 backdrop-blur ">
-        <ul className="flex gap-4 p-3 rounded-full">
-          <li>
-            <Link href="/" className="text-white">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link href="/about" className="text-white">
-              About
-            </Link>
-          </li>
-          <li>
-            <Link href="/project-view" className="text-white">
-              Project View
-            </Link>
-          </li>
-          <li>
-            <Link href="/services" className="text-white">
-              Services
-            </Link>
-          </li>
-          <li>
-            <Link href="/experiences" className="text-white">
-              Experiences
-            </Link>
-          </li>
-          <li>
-            <Link href="/experiences" className="text-white">
-              Study
-            </Link>
-          </li>
-          <li>
-            <Link href="/blog" className="text-white">
-              Blog
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </header>
+  className={`fixed top-0 left-0 w-full h-[5vh] z-50 transition-transform duration-200 ${
+    isVisible ? 'translate-y-0' : '-translate-y-full'
+  }`}
+>
+  <nav className="bg-[#141414]/70 backdrop-blur max-w-5xl mx-auto flex justify-center">
+    <ul className="flex gap-4 p-3 rounded-full">
+      <li>
+        <Link href="/" className="text-white">
+          Home
+        </Link>
+      </li>
+      <li>
+        <Link href="/about" className="text-white">
+          About
+        </Link>
+      </li>
+      <li>
+        <Link href="/project-view" className="text-white">
+          Project View
+        </Link>
+      </li>
+      <li>
+        <Link href="/services" className="text-white">
+          Services
+        </Link>
+      </li>
+      <li>
+        <Link href="/experiences" className="text-white">
+          Experiences
+        </Link>
+      </li>
+      <li>
+        <Link href="/experiences" className="text-white">
+          Study
+        </Link>
+      </li>
+      <li>
+        <Link href="/blog" className="text-white">
+          Blog
+        </Link>
+      </li>
+    </ul>
+  </nav>
+</header>
+
   );
 };
 
