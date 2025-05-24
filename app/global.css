@@ -1,2 +1,26 @@
 @import "tailwindcss";
 
+
+@font-face {
+    font-family: 'Rajdhani';
+    src: url('../public/Fonts/Rajdhani-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  .rajdhani{
+    font-family: 'Rajdhani';
+  }
+
+
+
+  .base-template__wrapper {
+	max-width: 1560px;
+}
+
+.base-template__text {
+	margin-bottom: 60px;
+}
+
+  

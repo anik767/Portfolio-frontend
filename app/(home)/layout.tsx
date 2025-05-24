@@ -1,7 +1,7 @@
 // app/layout.tsx
 import Navbar from '../component/nav/page';
 import Footer from '../component/footer/page';
-import '../global.css' 
+
 
 export const metadata = {
   title: 'My Website',

@@ -1,5 +1,5 @@
 "use client";
-import "../global.css";
+// import "../global.css";
 import Adminnav from "../component/adminnav";
 import AdminFooter from "../component/adminfooter";
 import { useEffect, useState } from "react";

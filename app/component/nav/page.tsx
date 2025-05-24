@@ -26,12 +26,12 @@ const Nav: React.FC = () => {
 
   return (
     <header
-  className={`fixed top-0 left-0 w-full h-[5vh] z-50 transition-transform duration-200 ${
-    isVisible ? 'translate-y-0' : '-translate-y-full'
+  className={`fixed top-5 left-0 w-full h-[5vh] z-50 transition-transform duration-200 ${
+    isVisible ? 'translate-y-0' : '-translate-y-16'
   }`}
 >
-  <nav className="bg-[#141414]/70 backdrop-blur max-w-5xl mx-auto flex justify-center">
-    <ul className="flex gap-4 p-3 rounded-full">
+  <nav className="  max-w-5xl mx-auto flex justify-center rajdhani">
+    <ul className="flex gap-4 p-4 rounded-full bg-black">
       <li>
         <Link href="/" className="text-white">
           Home
@@ -43,8 +43,8 @@ const Nav: React.FC = () => {
         </Link>
       </li>
       <li>
-        <Link href="/project-view" className="text-white">
-          Project View
+        <Link href="/my-project" className="text-white">
+          Projects
         </Link>
       </li>
       <li>
@@ -58,13 +58,13 @@ const Nav: React.FC = () => {
         </Link>
       </li>
       <li>
-        <Link href="/experiences" className="text-white">
+        <Link href="/study" className="text-white">
           Study
         </Link>
       </li>
       <li>
         <Link href="/blog" className="text-white">
-          Blog
+          Blogs
         </Link>
       </li>
     </ul>

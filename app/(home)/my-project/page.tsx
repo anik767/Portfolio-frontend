@@ -1,8 +1,8 @@
 'use client';
-
 import Image from 'next/image';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface Post {
   id: number;
@@ -19,6 +19,7 @@ const ProjectViewPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
   const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || `${API_BASE_URL}/storage`;
@@ -40,7 +41,24 @@ const ProjectViewPage = () => {
   const goToPreviousPage = () => setCurrentPage(page => Math.max(page - 1, 1));
   const goToNextPage = () => setCurrentPage(page => Math.min(page + 1, totalPages));
 
-  if (loading) return <div className="text-center py-10 text-gray-500">Loading...</div>;
+  if (loading) {
+    // এখানে Skeleton ব্যবহার করছি
+    return (
+      <div className="container mx-auto p-5 font-cursive">
+        <h1 className="text-3xl font-semibold mb-6"><Skeleton width={200} /></h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="border border-gray-300 rounded-lg p-4 shadow-sm bg-white">
+              <Skeleton height={200} className="mb-4" />
+              <Skeleton width={`80%`} height={24} className="mb-3" />
+              <Skeleton count={3} />
+              <Skeleton width={`60%`} height={20} className="mt-3" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-5 font-cursive">
@@ -62,8 +80,6 @@ const ProjectViewPage = () => {
                   if (e.key === 'Enter') window.open(post.project_url, '_blank');
                 }}
               >
-
-
                 {post.image && (
                   <Image
                     src={`${STORAGE_BASE_URL}/${cleanImagePath(post.image)}`}
@@ -82,7 +98,7 @@ const ProjectViewPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline mb-3 break-all"
-                  onClick={(e) => e.stopPropagation()} // ✅ Prevents triggering outer div's onClick
+                  onClick={(e) => e.stopPropagation()}
                 >
                   {post.git_url}
                 </a>
@@ -119,7 +135,6 @@ const ProjectViewPage = () => {
         </>
       )}
     </div>
-
   );
 };
 
