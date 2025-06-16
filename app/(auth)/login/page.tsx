@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,12 +13,34 @@ export default function LoginPage() {
 
   // UI state
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Load saved email/password if "remember me" was checked
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.replace("/admin");
+    }
+
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedPassword = localStorage.getItem("rememberedPassword");
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!email.trim() || !password) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
+
     setLoading(true);
-    setError("");
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
@@ -27,20 +50,34 @@ export default function LoginPage() {
       });
 
       if (!res.ok) {
-        // Extract error message from Laravel response
-        const data = await res.json();
-        throw new Error(data.message || "Login failed");
+        let errorMsg = "Login failed";
+        try {
+          const data = await res.json();
+          if (data.message) errorMsg = data.message;
+        } catch {
+          // ignore
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await res.json();
 
-      // Store JWT or token in localStorage
       localStorage.setItem("token", data.token);
 
-      // Redirect to admin dashboard after successful login
+      // Save or clear email/password for remember me
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+        localStorage.setItem("rememberedPassword", password);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+      }
+
+      toast.success("Login successful!");
       router.push("/admin");
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      toast.error(err.message || "Something went wrong");
+      setPassword("");
     } finally {
       setLoading(false);
     }
@@ -51,16 +88,9 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium mb-1"
-            >
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email address
             </label>
             <input
@@ -77,7 +107,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label
               htmlFor="password"
               className="block text-sm font-medium mb-1"
@@ -85,7 +115,7 @@ export default function LoginPage() {
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -95,6 +125,26 @@ export default function LoginPage() {
               required
               autoComplete="current-password"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-[38px] text-sm text-blue-600 focus:outline-none"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="rememberMe"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="rememberMe" className="text-sm select-none">
+              Remember me
+            </label>
           </div>
 
           <button

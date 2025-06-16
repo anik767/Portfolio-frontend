@@ -5,15 +5,14 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-console.log(apiUrl);
 
 const NewProjectPage = () => {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
-  const [project_url, setproject_url] = useState('');
+  const [project_url, setProjectUrl] = useState('');
   const [content, setContent] = useState('');
-  const [git_url, setgit_url] = useState('');
+  const [git_url, setGitUrl] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -44,16 +43,32 @@ const NewProjectPage = () => {
         formData.append('image', imageFile);
       }
 
+      const token = localStorage.getItem('token'); // get token from localStorage
+      if (!token) {
+        setError('You must be logged in to create a project.');
+        setSaving(false);
+        return;
+      }
+
       const res = await fetch(`${apiUrl}/project-posts`, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Don't set Content-Type header when sending FormData
+        },
         body: formData,
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Failed to create project: ${errorText}`);
+        let errorMessage = await res.text();
+        try {
+          const errorJson = JSON.parse(errorMessage);
+          errorMessage = errorJson.message || errorMessage;
+        } catch {}
+        throw new Error(`Failed to create project: ${errorMessage}`);
       }
 
+      // Success: redirect to admin project list page
       router.push('/admin/project');
     } catch (err) {
       setError((err as Error).message);
@@ -78,7 +93,7 @@ const NewProjectPage = () => {
             type="text"
             className="w-full border rounded px-3 py-2"
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
             required
             disabled={saving}
             autoFocus
@@ -94,7 +109,7 @@ const NewProjectPage = () => {
             rows={6}
             className="w-full border rounded px-3 py-2"
             value={content}
-            onChange={e => setContent(e.target.value)}
+            onChange={(e) => setContent(e.target.value)}
             required
             disabled={saving}
           />
@@ -109,7 +124,7 @@ const NewProjectPage = () => {
             type="text"
             className="w-full border rounded px-3 py-2"
             value={git_url}
-            onChange={e => setgit_url(e.target.value)}
+            onChange={(e) => setGitUrl(e.target.value)}
             required
             disabled={saving}
           />
@@ -124,7 +139,7 @@ const NewProjectPage = () => {
             type="text"
             className="w-full border rounded px-3 py-2"
             value={project_url}
-            onChange={e => setproject_url(e.target.value)}
+            onChange={(e) => setProjectUrl(e.target.value)}
             required
             disabled={saving}
           />

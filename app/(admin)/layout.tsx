@@ -1,4 +1,5 @@
 "use client";
+
 import Adminnav from "../component/adminnav";
 import AdminFooter from "../component/adminfooter";
 import { useEffect, useState } from "react";
@@ -9,17 +10,18 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setIsClient(true); // Indicate client-side rendering started
 
-    // Check for token (replace 'token' with your actual token key)
+    // Check for token in localStorage
     const token = localStorage.getItem("token");
 
     if (!token) {
       // Redirect to login if no token found
-      router.replace("/login");
+      router.replace("/login"); // Use your actual login route path
     }
   }, [router]);
 
+  // Prevent rendering on server and before token check is done
   if (!isClient) {
     return null;
   }

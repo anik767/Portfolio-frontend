@@ -67,6 +67,16 @@ const Nav: React.FC = () => {
           Blogs
         </Link>
       </li>
+      <li>
+        <Link href="/admin" className="text-white">
+          admin
+        </Link>
+      </li>
+      <li>
+        <Link href="/login" className="text-white">
+          login
+        </Link>
+      </li>
     </ul>
   </nav>
 </header>
