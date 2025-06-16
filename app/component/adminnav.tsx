@@ -16,6 +16,9 @@ const Nav: React.FC = () => {
             <Link href="/admin" style={{ textDecoration: 'none', fontFamily: 'cursive' }}>
                 <h1>Admin Page</h1>
             </Link>
+            <Link href="/" style={{ textDecoration: 'none', fontFamily: 'cursive' }}>
+                <h1>Home</h1>
+            </Link>
             <nav>
                 <ul
                     style={{
