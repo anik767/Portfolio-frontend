@@ -22,7 +22,7 @@ const ProjectViewPage = () => {
   
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-  const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || `${API_BASE_URL}/storage`;
+  const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_URL ;
 
   const cleanImagePath = (path: string) => path.replace(/^\/+/, '').replace(/\/+$/, '');
 
