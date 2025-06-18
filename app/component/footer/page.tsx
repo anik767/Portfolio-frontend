@@ -3,7 +3,6 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TailSpin } from 'react-loader-spinner';
 
 const Footer = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -143,7 +142,7 @@ const Footer = () => {
               className="bg-blue-600 hover:bg-blue-700 transition-colors px-6 py-3 rounded text-white font-semibold disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? <TailSpin height={20} width={20} color="#fff" /> : 'Send Message'}
+              {loading ? 'Sending...' : 'Send Message'}
             </button>
             <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
           </form>
