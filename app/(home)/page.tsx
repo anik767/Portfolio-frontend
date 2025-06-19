@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Typewriter } from "react-simple-typewriter";
 import damo from "../../public/Image/Home/damo.png";
 import SwiperSlider from "../component/swiper/page";
-
+// import background from '../../public/Image/Login/login_background.jpg'
 export default function Home() {
   return (
     <>
@@ -68,7 +68,7 @@ export default function Home() {
         <div className="container mx-auto  rounded-xl  p-12 ">
           <header className="text-center mb-12">
             <h1 className="text-5xl font-extrabold tracking-wide mb-2">About Me</h1>
-            <p className="text-lg font-semibold text-gray-600">Frontend Developer / Freelancer</p>
+            <p className="text-lg font-semibold text-gray-600">Frontend Developer</p>
           </header>
 
           <div className="grid grid-cols-[50%50%] md:flex-row ">
@@ -157,13 +157,12 @@ export default function Home() {
           </div>
         </article>
       </section>
-
-
-
-
-      <section>
+      <section className="">
         <SwiperSlider></SwiperSlider>
       </section>
+
+      
+
 
 
 

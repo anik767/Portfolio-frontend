@@ -1,7 +1,10 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { apiFetch } from '../../../utils/apiClient';
+import ConfirmModal from '../../../component/ConfirmModal';
 
 interface Project {
   id: number;
@@ -19,8 +22,6 @@ interface PaginatedResponse {
   prev_page_url: string | null;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
 const ProjectListPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -28,13 +29,15 @@ const ProjectListPage = () => {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDeleteId, setSelectedDeleteId] = useState<number | null>(null);
 
   const loadProjects = async (page: number = 1) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiUrl}/project-posts?page=${page}`);
-      if (!res.ok) throw new Error(res.statusText);
+      const res = await apiFetch(`/project-posts?page=${page}`);
+      if (!res.ok) throw new Error(await res.text());
       const data: PaginatedResponse = await res.json();
       setProjects(data.data || []);
       setCurrentPage(data.current_page);
@@ -50,20 +53,28 @@ const ProjectListPage = () => {
     loadProjects();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this project?')) return;
-    setDeletingId(id);
-    setError(null);
+  const confirmDelete = (id: number) => {
+    setSelectedDeleteId(id);
+    setShowModal(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!selectedDeleteId) return;
+
+    setDeletingId(selectedDeleteId);
+    setShowModal(false);
+
     try {
-      const res = await fetch(`${apiUrl}/project-posts/${id}`, {
+      const res = await apiFetch(`/project-posts/${selectedDeleteId}`, {
         method: 'DELETE',
       });
-      if (!res.ok) throw new Error('Failed to delete project');
+      if (!res.ok) throw new Error(await res.text());
       await loadProjects(currentPage);
     } catch (e) {
-      setError((e as Error).message);
+      setError((e as Error).message || 'Failed to delete project');
     } finally {
       setDeletingId(null);
+      setSelectedDeleteId(null);
     }
   };
 
@@ -77,7 +88,7 @@ const ProjectListPage = () => {
     <main className="max-w-5xl mx-auto p-5 font-cursive">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-semibold">All Projects</h1>
-        <Link href="/admin/project/new_project" passHref>
+        <Link href="/admin/project/new_project">
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
             + Create New Project
           </button>
@@ -93,10 +104,11 @@ const ProjectListPage = () => {
       ) : (
         <>
           <ul className="space-y-4">
-            {projects.map(project => (
+            {projects.map((project) => (
               <li
                 key={project.id}
-                className="border p-4 rounded shadow-md flex justify-between items-center"
+                className="border p-4 rounded  flex justify-between items-center"
+                
               >
                 <article className="max-w-[75%] flex items-center gap-4">
                   {project.image_url && (
@@ -129,8 +141,10 @@ const ProjectListPage = () => {
                     </button>
                   </Link>
                   <button
-                    onClick={() => handleDelete(project.id)}
-                    className={`bg-red-600 text-white px-3 py-1 rounded ${deletingId === project.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => confirmDelete(project.id)}
+                    className={`bg-red-600 text-white px-3 py-1 rounded ${
+                      deletingId === project.id ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                     disabled={deletingId === project.id}
                   >
                     {deletingId === project.id ? 'Deleting...' : 'Delete'}
@@ -162,6 +176,14 @@ const ProjectListPage = () => {
           </div>
         </>
       )}
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={showModal}
+        onCancel={() => setShowModal(false)}
+        onConfirm={handleDeleteConfirmed}
+        message="Are you sure you want to delete this project?"
+      />
     </main>
   );
 };

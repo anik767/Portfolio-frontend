@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+import { apiFetch } from '../../../../utils/apiClient';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Project {
   id: number;
@@ -22,7 +23,6 @@ export default function EditProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -34,7 +34,9 @@ export default function EditProjectPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${apiUrl}/project-posts/${id}`)
+    setLoading(true);
+
+    apiFetch(`/project-posts/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch project');
         return res.json();
@@ -48,11 +50,12 @@ export default function EditProjectPage() {
         setProjectUrl(p.project_url || '');
         setPreviewUrl(p.image_url || null);
       })
-      .catch(err => setError(err.message))
+      .catch(err => {
+        toast.error(`Error loading project: ${err.message}`);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Cleanup old object URLs to avoid memory leaks
   useEffect(() => {
     return () => {
       if (previewUrl && imageFile) {
@@ -78,7 +81,6 @@ export default function EditProjectPage() {
     if (!id) return;
 
     setSaving(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -90,120 +92,121 @@ export default function EditProjectPage() {
         formData.append('image', imageFile);
       }
 
-      const res = await fetch(`${apiUrl}/project-posts/${id}`, {
+      const res = await apiFetch(`/project-posts/${id}`, {
         method: 'POST',
         headers: {
-          'X-HTTP-Method-Override': 'PUT', // Laravel expects this for PUT
+          'X-HTTP-Method-Override': 'PUT',
         },
         body: formData,
       });
 
-      const responseText = await res.text();
-
       if (!res.ok) {
-        console.error('Failed to update:', responseText);
-        throw new Error('Failed to update project');
+        const errorText = await res.text();
+        throw new Error(errorText || 'Failed to update project');
       }
 
+      toast.success('Project updated successfully!');
       router.push('/admin/project');
     } catch (err) {
-      setError((err as Error).message);
+      toast.error(`Error saving project: ${(err as Error).message}`);
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) return <div className="p-5 text-center">Loading…</div>;
-  if (error) return <div className="p-5 text-red-600">{error}</div>;
   if (!project) return <div className="p-5">Project not found.</div>;
 
   return (
-    <main className="max-w-xl mx-auto p-5">
-      <h1 className="text-2xl mb-6">Edit Project #{id}</h1>
+    <>
+      <main className="max-w-xl mx-auto p-5">
+        <h1 className="text-2xl mb-6">Edit Project #{id}</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
-        <div>
-          <label htmlFor="title" className="block font-semibold mb-1">Title</label>
-          <input
-            id="title"
-            type="text"
-            className="w-full border rounded px-3 py-2"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            required
-            disabled={saving}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="content" className="block font-semibold mb-1">Content</label>
-          <textarea
-            id="content"
-            rows={6}
-            className="w-full border rounded px-3 py-2"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            required
-            disabled={saving}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="git_url" className="block font-semibold mb-1">Git URL</label>
-          <input
-            id="git_url"
-            type="url"
-            className="w-full border rounded px-3 py-2"
-            value={git_url}
-            onChange={e => setGitUrl(e.target.value)}
-            required
-            disabled={saving}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="project_url" className="block font-semibold mb-1">Project URL</label>
-          <input
-            id="project_url"
-            type="url"
-            className="w-full border rounded px-3 py-2"
-            value={project_url}
-            onChange={e => setProjectUrl(e.target.value)}
-            required
-            disabled={saving}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="image" className="block font-semibold mb-1">Change Image</label>
-          <input
-            id="image"
-            type="file"
-            accept="image/*"
-            className="w-full"
-            onChange={handleImageChange}
-            disabled={saving}
-          />
-          {previewUrl && (
-            <Image
-              src={previewUrl}
-              alt={`Preview for ${title || 'project image'}`}
-              width={500}
-              height={100}
-              className="mt-2 w-[50%] rounded"
-              unoptimized
+        <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
+          <div>
+            <label htmlFor="title" className="block font-semibold mb-1">Title</label>
+            <input
+              id="title"
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              required
+              disabled={saving}
             />
-          )}
-        </div>
+          </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-        >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-      </form>
-    </main>
+          <div>
+            <label htmlFor="content" className="block font-semibold mb-1">Content</label>
+            <textarea
+              id="content"
+              rows={6}
+              className="w-full border rounded px-3 py-2"
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              required
+              disabled={saving}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="git_url" className="block font-semibold mb-1">Git URL</label>
+            <input
+              id="git_url"
+              type="url"
+              className="w-full border rounded px-3 py-2"
+              value={git_url}
+              onChange={e => setGitUrl(e.target.value)}
+              required
+              disabled={saving}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="project_url" className="block font-semibold mb-1">Project URL</label>
+            <input
+              id="project_url"
+              type="url"
+              className="w-full border rounded px-3 py-2"
+              value={project_url}
+              onChange={e => setProjectUrl(e.target.value)}
+              required
+              disabled={saving}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="image" className="block font-semibold mb-1">Change Image</label>
+            <input
+              id="image"
+              type="file"
+              accept="image/*"
+              className="w-full"
+              onChange={handleImageChange}
+              disabled={saving}
+            />
+            {previewUrl && (
+              <Image
+                src={previewUrl}
+                alt={`Preview for ${title || 'project image'}`}
+                width={500}
+                height={100}
+                className="mt-2 w-[50%] rounded"
+                unoptimized
+              />
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </form>
+      </main>
+      <ToastContainer position="top-right" autoClose={3000} />
+    </>
   );
 }

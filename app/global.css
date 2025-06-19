@@ -8,9 +8,29 @@
     font-style: normal;
     font-display: swap;
   }
+@font-face {
+    font-family: 'Epilogue';
+    src: url('../public/Fonts/Epilogue-VariableFont_wght.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+@font-face {
+    font-family: 'Poppins';
+    src: url('../public/Fonts/Poppins-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
 
   .rajdhani{
     font-family: 'Rajdhani';
+  }
+  .Epilogue{
+    font-family: 'Epilogue';
+  }
+  .Poppins{
+    font-family: 'Poppins';
   }
 
 

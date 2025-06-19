@@ -4,24 +4,23 @@ import Adminnav from "../component/adminnav";
 import AdminFooter from "../component/adminfooter";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Indicate client-side rendering started
+    setIsClient(true);
 
-    // Check for token in localStorage
     const token = localStorage.getItem("token");
 
     if (!token) {
-      // Redirect to login if no token found
-      router.replace("/login"); // Use your actual login route path
+      router.replace("/login");
     }
   }, [router]);
 
-  // Prevent rendering on server and before token check is done
   if (!isClient) {
     return null;
   }
@@ -31,6 +30,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <Adminnav />
       <main className="min-h-screen">{children}</main>
       <AdminFooter />
+      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 };

@@ -15,11 +15,18 @@ const Footer = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
-      // Simulate API call or replace with your actual API logic
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
       toast.success('Message sent successfully! 🎉');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
@@ -28,6 +35,7 @@ const Footer = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <footer className="bg-[#111] text-white py-8 ">
