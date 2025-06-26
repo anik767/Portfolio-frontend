@@ -1,9 +1,10 @@
+'use client';
+
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
 
+// Import only the required Swiper styles
 import 'swiper/css';
-import 'swiper/css/pagination';
 
 export default function SwiperSlider() {
   const slides = [
@@ -47,31 +48,17 @@ export default function SwiperSlider() {
       authorImg: 'https://bato-web-agency.github.io/bato-shared/img/slider-1/author-3.jpg',
       text: 'Immerse yourself in the depths of calm and harmony.',
     },
-    {
-      img: 'https://bato-web-agency.github.io/bato-shared/img/slider-1/slide-3.jpg',
-      title: 'Oceans of Serenity',
-      price: '$225',
-      author: 'Inna Grande',
-      authorImg: 'https://bato-web-agency.github.io/bato-shared/img/slider-1/author-3.jpg',
-      text: 'Immerse yourself in the depths of calm and harmony.',
-    },
-    // ... you can add more slides if you want
+    // Duplicates or more slides if needed
   ];
 
   return (
     <section className="max-w-[1560px] mx-auto px-4">
-      <Swiper
-        slidesPerView={3}
-        spaceBetween={30} // space between slides in px
-        pagination={{ clickable: true }}
-        modules={[Pagination]}
-        className="mySwiper"
-      >
+      <Swiper slidesPerView={3} spaceBetween={30} className="mySwiper">
         {slides.map((slide, index) => (
           <SwiperSlide
             key={index}
             className="bg-white rounded-lg shadow-md overflow-hidden"
-            style={{ display: 'block' }} // ensure slides display block for spacing
+            style={{ display: 'block' }}
           >
             <img src={slide.img} alt={slide.title} className="w-full h-48 object-cover" />
             <div className="p-4">

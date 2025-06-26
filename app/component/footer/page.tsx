@@ -1,8 +1,15 @@
 'use client';
+
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Utility function to extract cookie value
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+};
 
 const Footer = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -15,28 +22,42 @@ const Footer = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
+      // 1. Get the CSRF token
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sanctum/csrf-cookie`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const token = getCookie('XSRF-TOKEN');
+
+      if (!token) throw new Error('CSRF token not found');
+
+      // 2. Submit contact form
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contact`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRF-TOKEN': token,
+        },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.message || 'Submission failed');
       }
-  
+
       toast.success('Message sent successfully! 🎉');
       setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      toast.error('Failed to send message. Please try again.');
+    } catch (error: any) {
+      toast.error(`Failed to send message: ${error.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
   };
-  
-
   return (
     <footer className="bg-[#111] text-white py-8 ">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -51,51 +72,72 @@ const Footer = () => {
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-3">Follow me</h3>
             <div className="flex gap-4 items-start ">
-              {/* Social Icons Here */}
-              <Link href="https://www.facebook.com" target='_blank' className=""><svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={4}>
-                  <path strokeDasharray={24} strokeDashoffset={24} d="M17 4l-2 0c-2.5 0 -4 1.5 -4 4v12">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"></animate>
+              {/* Social Icons */}
+              <Link href="https://www.facebook.com" target="_blank" className="">
+                <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={4}>
+                    <path strokeDasharray={24} strokeDashoffset={24} d="M17 4l-2 0c-2.5 0 -4 1.5 -4 4v12">
+                      <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"></animate>
+                    </path>
+                    <path strokeDasharray={8} strokeDashoffset={8} d="M8 12h7">
+                      <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.5s" dur="0.2s" values="8;0"></animate>
+                    </path>
+                  </g>
+                </svg>
+              </Link>
+              <Link href="#" target="_blank" className="">
+                <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                  <circle cx={4} cy={4} r={2} fill="currentColor" fillOpacity={0}>
+                    <animate fill="freeze" attributeName="fill-opacity" dur="0.15s" values="0;1"></animate>
+                  </circle>
+                  <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={4}>
+                    <path strokeDasharray={12} strokeDashoffset={12} d="M4 10v10">
+                      <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.15s" dur="0.2s" values="12;0"></animate>
+                    </path>
+                    <path strokeDasharray={12} strokeDashoffset={12} d="M10 10v10">
+                      <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.45s" dur="0.2s" values="12;0"></animate>
+                    </path>
+                    <path strokeDasharray={24} strokeDashoffset={24} d="M10 15c0 -2.76 2.24 -5 5 -5c2.76 0 5 2.24 5 5v5">
+                      <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.65s" dur="0.2s" values="24;0"></animate>
+                    </path>
+                  </g>
+                </svg>
+              </Link>
+              <Link href="#" target="_blank" className="">
+                <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    strokeDasharray={64}
+                    strokeDashoffset={64}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19.89 7.34c-0.09 0.33 -0.49 1.16 -1.17 1.95c-0.45 8.68 -8.87 11.5 -14.64 8.59c-0.79 -1.05 2.85 -0.62 4.18 -2.63c-5.03 -2.57 -4.63 -9.44 -3.62 -9.16c2.37 3.19 6.19 3.48 6.81 3.19c0 -0.73 -0.31 -2.32 1.41 -3.65c0.99 -0.71 3.06 -1.34 4.93 0.69c0.32 0.21 0.78 0.3 1.47 0.15c0.41 -0.21 0.95 -0.07 0.67 0.66Z"
+                  >
+                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"></animate>
                   </path>
-                  <path strokeDasharray={8} strokeDashoffset={8} d="M8 12h7">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.5s" dur="0.2s" values="8;0"></animate>
-                  </path>
-                </g>
-              </svg></Link>
-              <Link href="#" target='_blank' className="" ><svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                <circle cx={4} cy={4} r={2} fill="currentColor" fillOpacity={0}>
-                  <animate fill="freeze" attributeName="fill-opacity" dur="0.15s" values="0;1"></animate>
-                </circle>
-                <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={4}>
-                  <path strokeDasharray={12} strokeDashoffset={12} d="M4 10v10">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.15s" dur="0.2s" values="12;0"></animate>
-                  </path>
-                  <path strokeDasharray={12} strokeDashoffset={12} d="M10 10v10">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.45s" dur="0.2s" values="12;0"></animate>
-                  </path>
-                  <path strokeDasharray={24} strokeDashoffset={24} d="M10 15c0 -2.76 2.24 -5 5 -5c2.76 0 5 2.24 5 5v5">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.65s" dur="0.2s" values="24;0"></animate>
-                  </path>
-                </g>
-              </svg></Link>
-              <Link href="#" target='_blank' className="" ><svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                <path fill="none" stroke="currentColor" strokeDasharray={64} strokeDashoffset={64} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.89 7.34c-0.09 0.33 -0.49 1.16 -1.17 1.95c-0.45 8.68 -8.87 11.5 -14.64 8.59c-0.79 -1.05 2.85 -0.62 4.18 -2.63c-5.03 -2.57 -4.63 -9.44 -3.62 -9.16c2.37 3.19 6.19 3.48 6.81 3.19c0 -0.73 -0.31 -2.32 1.41 -3.65c0.99 -0.71 3.06 -1.34 4.93 0.69c0.32 0.21 0.78 0.3 1.47 0.15c0.41 -0.21 0.95 -0.07 0.67 0.66Z">
-                  <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"></animate>
-                </path>
-              </svg></Link>
-              <Link href="#" target='_blank' className="w-[60px]" ><svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
-                <circle cx={17} cy={7} r={1.5} fill="currentColor" fillOpacity={0}>
-                  <animate fill="freeze" attributeName="fill-opacity" begin="1.3s" dur="0.15s" values="0;1"></animate>
-                </circle>
-                <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
-                  <path strokeDasharray={72} strokeDashoffset={72} d="M16 3c2.76 0 5 2.24 5 5v8c0 2.76 -2.24 5 -5 5h-8c-2.76 0 -5 -2.24 -5 -5v-8c0 -2.76 2.24 -5 5 -5h4Z">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="72;0"></animate>
-                  </path>
-                  <path strokeDasharray={28} strokeDashoffset={28} d="M12 8c2.21 0 4 1.79 4 4c0 2.21 -1.79 4 -4 4c-2.21 0 -4 -1.79 -4 -4c0 -2.21 1.79 -4 4 -4">
-                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.6s" values="28;0"></animate>
-                  </path>
-                </g>
-              </svg></Link>
+                </svg>
+              </Link>
+              <Link href="#" target="_blank" className="w-[60px]">
+                <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24">
+                  <circle cx={17} cy={7} r={1.5} fill="currentColor" fillOpacity={0}>
+                    <animate fill="freeze" attributeName="fill-opacity" begin="1.3s" dur="0.15s" values="0;1"></animate>
+                  </circle>
+                  <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
+                    <path
+                      strokeDasharray={72}
+                      strokeDashoffset={72}
+                      d="M16 3c2.76 0 5 2.24 5 5v8c0 2.76 -2.24 5 -5 5h-8c-2.76 0 -5 -2.24 -5 -5v-8c0 -2.76 2.24 -5 5 -5h4Z"
+                    >
+                      <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="72;0"></animate>
+                    </path>
+                    <path strokeDasharray={28} strokeDashoffset={28} d="M12 8c2.21 0 4 1.79 4 4c0 2.21 -1.79 4 -4 4c-2.21 0 -4 -1.79 -4 -4c0 -2.21 1.79 -4 4 -4">
+                      <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.6s" values="28;0"></animate>
+                    </path>
+                  </g>
+                </svg>
+              </Link>
             </div>
           </div>
         </div>
@@ -104,13 +146,36 @@ const Footer = () => {
         <div>
           <h2 className="text-2xl font-bold mb-4">Pages</h2>
           <ul className="space-y-2">
-
-            <li><Link href="/about" className="text-gray-300 hover:text-white">About</Link></li>
-            <li><Link href="/projects" className="text-gray-300 hover:text-white">projects</Link></li>
-            <li><Link href="/services" className="text-gray-300 hover:text-white">Services</Link></li>
-            <li><Link href="/experiences" className="text-gray-300 hover:text-white">Experiences</Link></li>
-            <li><Link href="/study" className="text-gray-300 hover:text-white">Study</Link></li>
-            <li><Link href="/blog" className="text-gray-300 hover:text-white">Blogs</Link></li>
+            <li>
+              <Link href="/about" className="text-gray-300 hover:text-white">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/projects" className="text-gray-300 hover:text-white">
+                projects
+              </Link>
+            </li>
+            <li>
+              <Link href="/services" className="text-gray-300 hover:text-white">
+                Services
+              </Link>
+            </li>
+            <li>
+              <Link href="/experiences" className="text-gray-300 hover:text-white">
+                Experiences
+              </Link>
+            </li>
+            <li>
+              <Link href="/study" className="text-gray-300 hover:text-white">
+                Study
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="text-gray-300 hover:text-white">
+                Blogs
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -158,10 +223,9 @@ const Footer = () => {
       </div>
 
       <div className="text-center text-gray-500 text-sm mt-12">
-        &copy; {new Date().getFullYear()}  All Rights Reserved.
+        &copy; {new Date().getFullYear()} All Rights Reserved.
       </div>
     </footer>
-
   );
 };
 

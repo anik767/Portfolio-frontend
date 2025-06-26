@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { apiFetch } from '../../utils/apiClient';
 import ConfirmModal from '../../component/ConfirmModal';
 
 interface Project {
@@ -22,6 +21,8 @@ interface PaginatedResponse {
   prev_page_url: string | null;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function Admin() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -36,8 +37,13 @@ export default function Admin() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/project-posts?page=${page}`);
-      if (!res.ok) throw new Error(await res.text());
+      const res = await fetch(`${API_BASE_URL}/project-posts?page=${page}`, {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to load projects');
+      }
       const data: PaginatedResponse = await res.json();
       setProjects(data.data || []);
       setCurrentPage(data.current_page);
@@ -65,10 +71,14 @@ export default function Admin() {
     setShowModal(false);
 
     try {
-      const res = await apiFetch(`/project-posts/${selectedDeleteId}`, {
+      const res = await fetch(`${API_BASE_URL}/project-posts/${selectedDeleteId}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to delete project');
+      }
       await loadProjects(currentPage);
     } catch (e) {
       setError((e as Error).message || 'Failed to delete project');
@@ -87,7 +97,7 @@ export default function Admin() {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisiblePages = 4;
-  
+
     if (lastPage <= maxVisiblePages + 2) {
       for (let i = 1; i <= lastPage; i++) {
         pages.push(i);
@@ -115,11 +125,9 @@ export default function Admin() {
         pages.push(lastPage);
       }
     }
-  
+
     return pages;
   };
-  
-
 
   return (
     <>
@@ -133,11 +141,10 @@ export default function Admin() {
           color: 'white',
           textAlign: 'center',
           fontFamily: "'Arial', sans-serif",
-          minHeight: '',
+          minHeight: '200px',
           padding: '2rem',
         }}
       >
-        
         <h1 style={{ fontSize: '3rem', marginBottom: '10px', fontFamily: 'cursive' }}>
           Welcome to My Admin
         </h1>
@@ -148,12 +155,11 @@ export default function Admin() {
         </p>
       </div>
 
-
-      <div className="relative p-5 bg-white/30 backdrop-blur-[4px] rounded shadow text-black mt-8 w-full max-w-[40%] min-h-[650px]">
+      <div className=" relative p-5 border-[2px] border-black/20 bg-white/20 backdrop-blur-[4px] rounded shadow text-black m-8 w-full max-w-[40%] min-h-[650px]">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-[500] rajdhani">Projects</h1>
           <Link href="/admin/project/new_project">
-            <button className="bg-green-500 hover:bg-green-600 shadow-[#959da5]/30 shadow-[0px_8px_24px] hover:shadow-none rajdhani  text-white px-4 py-2 rounded">
+            <button className="bg-green-500 hover:bg-green-600 shadow-[#959da5]/30 shadow-[0px_8px_24px] hover:shadow-none rajdhani text-white px-4 py-2 rounded">
               Create New Project
             </button>
           </Link>
@@ -161,102 +167,102 @@ export default function Admin() {
 
         {error && <p className="mb-4 text-red-600 font-semibold">{error}</p>}
 
-         
+        
         <>
-          <ul className="space-y-2">
-            {projects.map((project) => (
-              <li
-                key={project.id}
-                className="border border-white/20 p-2 rounded  flex justify-between items-center shadow-[#959da5]/30 shadow-[0px_8px_24px]"
+            <ul className="space-y-2">
+              {projects.map((project) => (
+                <li
+                  key={project.id}
+                  className="border border-white/20 p-2 rounded flex justify-between items-center shadow-[#959da5]/30 shadow-[0px_8px_24px]"
+                >
+                  <article className="max-w-[75%] flex items-center gap-4">
+                    {project.image_url && (
+                      <Image
+                        src={project.image_url}
+                        alt={project.title}
+                        className="w-[150px] h-[50px] rounded-[10px] object-cover"
+                        unoptimized
+                        width={150}
+                        height={50}
+                      />
+                    )}
+                    <div className="flex gap-3 items-center">
+                      <h2 className="Epilogue font-[400] truncate w-[200px] overflow-hidden whitespace-nowrap ">
+                        {project.title}
+                      </h2>
+                      <p className="text-sm text-gray-600">
+                        {new Date(project.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </article>
 
-              >
-                <article className="max-w-[75%] flex items-center gap-4">
-                  {project.image_url && (
-                    <Image
-                      src={project.image_url}
-                      alt={project.title}
-                      className=" w-[150px] h-[50px] rounded-[10px] object-cover"
-                      unoptimized
-                      width={150}
-                      height={50}
-                    />
-                  )}
-                  <div className="flex gap-3 items-center">
-                    <h2 className="Epilogue font-[400] truncate w-[200px] overflow-hidden whitespace-nowrap ">
-                      {project.title}
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      {new Date(project.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </article>
-
-                <div className="flex space-x-2 flex-shrink-0">
-                  <Link href={`/admin/project/${project.id}`}>
+                  <div className="flex space-x-2 flex-shrink-0">
+                    <Link href={`/admin/project/${project.id}`}>
+                      <button
+                        className="rajdhani bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px] hover:shadow-none"
+                        disabled={deletingId === project.id}
+                      >
+                        Edit
+                      </button>
+                    </Link>
                     <button
-                      className="rajdhani bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px] hover:shadow-none"
+                      onClick={() => confirmDelete(project.id)}
+                      className={`rajdhani bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px] hover:shadow-none ${
+                        deletingId === project.id ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                       disabled={deletingId === project.id}
                     >
-                      Edit
+                      {deletingId === project.id ? 'Deleting...' : 'Delete'}
                     </button>
-                  </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Pagination Controls */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-2 ">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage <= 1}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer"
+              >
+                Previous
+              </button>
+
+              {getPageNumbers().map((page, idx) =>
+                typeof page === 'number' ? (
                   <button
-                    onClick={() => confirmDelete(project.id)}
-                    className={`rajdhani bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px] hover:shadow-none ${deletingId === project.id ? 'opacity-50 cursor-not-allowed' : ''
+                    key={`${page}-${idx}`}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded cursor-pointer
+                      ${
+                        page === currentPage
+                          ? 'bg-orange-400 text-white '
+                          : 'bg-gray-300 shadow-[1.95px_1.95px_2.6px_rgba(149,157,165,0.3)]'
                       }`}
-                    disabled={deletingId === project.id}
                   >
-                    {deletingId === project.id ? 'Deleting...' : 'Delete'}
+                    {page}
                   </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+                ) : (
+                  <span key={`ellipsis-${idx}`} className="px-2 py-2 select-none">
+                    {page}
+                  </span>
+                )
+              )}
 
-          {/* Pagination Controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-2 ">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer"
-            >
-              Previous
-            </button>
-
-            {getPageNumbers().map((page, idx) =>
-              typeof page === 'number' ? (
-                <button
-                  key={`${page}-${idx}`}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-4 py-2 rounded cursor-pointer
-                    ${page === currentPage
-                      ? 'bg-orange-400 text-white '
-                      : 'bg-gray-300 shadow-[1.95px_1.95px_2.6px_rgba(149,157,165,0.3)]'
-                    }`}
-                >
-                  {page}
-                </button>
-              ) : (
-                <span key={`ellipsis-${idx}`} className="px-2 py-2 select-none">
-                  {page}
-                </span>
-              )
-            )}
-
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage >= lastPage}
-              className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer"
-            >
-              Next
-            </button>
-          </div>
-        </>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage >= lastPage}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer"
+              >
+                Next
+              </button>
+            </div>
+          </>
         
 
-        {/* Confirm Modal */}
-
       </div>
+
       <ConfirmModal
         isOpen={showModal}
         onCancel={() => setShowModal(false)}

@@ -36,13 +36,11 @@ export default function EditProjectPage() {
 
     setLoading(true);
 
-    apiFetch(`/project-posts/${id}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch project');
-        return res.json();
-      })
+    apiFetch(`/admin/project-posts/${id}`)
       .then(data => {
+        // Adjust if your API returns { data: {...} }
         const p: Project = data.data || data;
+
         setProject(p);
         setTitle(p.title);
         setContent(p.content);
@@ -56,13 +54,14 @@ export default function EditProjectPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Revoke previous object URL on previewUrl change or component unmount
   useEffect(() => {
     return () => {
-      if (previewUrl && imageFile) {
+      if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
     };
-  }, [previewUrl, imageFile]);
+  }, [previewUrl]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -79,32 +78,23 @@ export default function EditProjectPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-
+  
     setSaving(true);
-
+  
     try {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
       formData.append('git_url', git_url);
       formData.append('project_url', project_url);
-      if (imageFile) {
-        formData.append('image', imageFile);
-      }
-
-      const res = await apiFetch(`/project-posts/${id}`, {
-        method: 'POST',
-        headers: {
-          'X-HTTP-Method-Override': 'PUT',
-        },
+      if (imageFile) formData.append('image', imageFile);
+      formData.append('_method', 'PUT'); // Add this for method override
+  
+      await apiFetch(`/admin/project-posts/${id}`, {
+        method: 'POST', // Use POST, Laravel will treat as PUT because of _method
         body: formData,
       });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || 'Failed to update project');
-      }
-
+  
       toast.success('Project updated successfully!');
       router.push('/admin/project');
     } catch (err) {
@@ -113,6 +103,7 @@ export default function EditProjectPage() {
       setSaving(false);
     }
   };
+  
 
   if (loading) return <div className="p-5 text-center">Loading…</div>;
   if (!project) return <div className="p-5">Project not found.</div>;

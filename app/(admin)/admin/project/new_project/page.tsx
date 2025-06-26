@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+import { apiFetch } from '../../../../utils/apiClient';
 
 const NewProjectPage = () => {
   const router = useRouter();
@@ -43,32 +42,11 @@ const NewProjectPage = () => {
         formData.append('image', imageFile);
       }
 
-      const token = localStorage.getItem('token'); // get token from localStorage
-      if (!token) {
-        setError('You must be logged in to create a project.');
-        setSaving(false);
-        return;
-      }
-
-      const res = await fetch(`${apiUrl}/project-posts`, {
+      const res = await apiFetch('/admin/project-posts', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Don't set Content-Type header when sending FormData
-        },
         body: formData,
       });
 
-      if (!res.ok) {
-        let errorMessage = await res.text();
-        try {
-          const errorJson = JSON.parse(errorMessage);
-          errorMessage = errorJson.message || errorMessage;
-        } catch {}
-        throw new Error(`Failed to create project: ${errorMessage}`);
-      }
-
-      // Success: redirect to admin project list page
       router.push('/admin/project');
     } catch (err) {
       setError((err as Error).message);
@@ -85,9 +63,7 @@ const NewProjectPage = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
         <div>
-          <label htmlFor="title" className="block font-semibold mb-1">
-            Title
-          </label>
+          <label htmlFor="title" className="block font-semibold mb-1">Title</label>
           <input
             id="title"
             type="text"
@@ -101,9 +77,7 @@ const NewProjectPage = () => {
         </div>
 
         <div>
-          <label htmlFor="content" className="block font-semibold mb-1">
-            Content
-          </label>
+          <label htmlFor="content" className="block font-semibold mb-1">Content</label>
           <textarea
             id="content"
             rows={6}
@@ -116,9 +90,7 @@ const NewProjectPage = () => {
         </div>
 
         <div>
-          <label htmlFor="git_url" className="block font-semibold mb-1">
-            Git url:
-          </label>
+          <label htmlFor="git_url" className="block font-semibold mb-1">Git URL</label>
           <input
             id="git_url"
             type="text"
@@ -131,9 +103,7 @@ const NewProjectPage = () => {
         </div>
 
         <div>
-          <label htmlFor="project_url" className="block font-semibold mb-1">
-            Project url:
-          </label>
+          <label htmlFor="project_url" className="block font-semibold mb-1">Project URL</label>
           <input
             id="project_url"
             type="text"
@@ -146,9 +116,7 @@ const NewProjectPage = () => {
         </div>
 
         <div>
-          <label htmlFor="image" className="block font-semibold mb-1">
-            Image File
-          </label>
+          <label htmlFor="image" className="block font-semibold mb-1">Image File</label>
           <input
             id="image"
             type="file"

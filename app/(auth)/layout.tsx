@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+// (auth)/layout.tsx
+import React, { ReactNode } from 'react';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.replace("/login"); // redirect to login if no token
-    }
-  }, [router]);
-
-  return <>{children}</>;
+export default function AuthLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      {children}
+    </div>
+  );
 }

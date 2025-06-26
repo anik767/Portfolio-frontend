@@ -2,33 +2,34 @@
 
 import Adminnav from "../component/adminnav";
 import AdminFooter from "../component/adminfooter";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
+
+  // Get login param as a string to use in effect dependencies
+  const loginStatus = searchParams.get("login");
 
   useEffect(() => {
-    setIsClient(true);
+    if (loginStatus === "success") {
+      toast.success("Login successful!");
 
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      router.replace("/login");
+      // Remove the query param from URL so toast doesn't repeat on refresh
+      // This won't reload page, just change URL using replace
+      const url = new URL(window.location.href);
+      url.searchParams.delete("login");
+      router.replace(url.pathname + url.search, { scroll: false });
     }
-  }, [router]);
-
-  if (!isClient) {
-    return null;
-  }
+  }, [loginStatus, router]);
 
   return (
     <>
       <Adminnav />
-      <main className="min-h-screen">{children}</main>
+      <main>{children}</main>
       <AdminFooter />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
