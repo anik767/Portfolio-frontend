@@ -21,7 +21,7 @@ interface PaginatedResponse {
   prev_page_url: string | null;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ;
 
 export default function Admin() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -131,31 +131,9 @@ export default function Admin() {
 
   return (
     <>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(to right, #6a11cb, #2575fc)',
-          color: 'white',
-          textAlign: 'center',
-          fontFamily: "'Arial', sans-serif",
-          minHeight: '200px',
-          padding: '2rem',
-        }}
-      >
-        <h1 style={{ fontSize: '3rem', marginBottom: '10px', fontFamily: 'cursive' }}>
-          Welcome to My Admin
-        </h1>
-        <p style={{ fontSize: '1.2rem', maxWidth: '600px', fontFamily: 'cursive' }}>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis eos possimus non! Eveniet
-          sequi deleniti facilis minus repudiandae odio quasi. Earum vero eveniet fugiat magni numquam
-          aperiam, excepturi cumque officia.
-        </p>
-      </div>
+      
 
-      <div className=" relative p-5 border-[2px] border-black/20 bg-white/20 backdrop-blur-[4px] rounded shadow text-black m-8 w-full max-w-[40%] min-h-[650px]">
+      <div className=" relative p-5    backdrop-blur-[4px] rounded shadow-[#959da5]/50 shadow-[0px_8px_24px] text-black  w-full max-w-[40%] min-h-[650px]">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-[500] rajdhani">Projects</h1>
           <Link href="/admin/project/new_project">
@@ -164,11 +142,8 @@ export default function Admin() {
             </button>
           </Link>
         </div>
-
         {error && <p className="mb-4 text-red-600 font-semibold">{error}</p>}
-
         
-        <>
             <ul className="space-y-2">
               {projects.map((project) => (
                 <li
@@ -258,9 +233,6 @@ export default function Admin() {
                 Next
               </button>
             </div>
-          </>
-        
-
       </div>
 
       <ConfirmModal

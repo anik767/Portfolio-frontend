@@ -7,6 +7,7 @@ interface Post {
   title: string;
   content: string;
   image?: string;
+  image_url?: string;
   created_at: string;
   git_url: string;
   project_url: string;
@@ -17,15 +18,12 @@ const ProjectViewPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-  const STORAGE_BASE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || '';
-
-  const cleanImagePath = (path: string) => path.replace(/^\/+/, '').replace(/\/+$/, '');
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ;
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/project-posts?page=${currentPage}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(`${API_BASE_URL}/project-posts?page=${currentPage}`)
+      .then((res) => res.json())
+      .then((data) => {
         setPosts(data.data || []);
         setTotalPages(data.last_page || 1);
       })
@@ -61,35 +59,34 @@ const ProjectViewPage = () => {
 
   return (
     <div className="container mx-auto p-5 font-cursive relative">
-      <h1 className="text-3xl font-semibold mb-6">Project Posts</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center">Project Posts</h1>
 
       {posts.length === 0 ? (
         <p className="text-center text-gray-600">No posts to display.</p>
       ) : (
         <>
           <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-2 py-4">
-            {posts.map(post => (
+            {posts.map((post) => (
               <article
                 key={post.id}
-                className="group relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
                 onClick={() => window.open(post.project_url, '_blank')}
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && window.open(post.project_url, '_blank')}
               >
-                <div className="invisible h-[235px]"></div>
+                <div className="relative w-full h-[235px] overflow-hidden">
+                  <img
+                    src={post.image_url || '/fallback.jpg'}
+                    alt={post.title}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
 
-                <div
-                  className="absolute top-0 left-0 w-full h-[235px] bg-cover bg-center bg-no-repeat transition-all duration-300 ease-out group-hover:h-full group-hover:opacity-60 rounded-t-xl"
-                  style={{
-                    backgroundImage: `url('${STORAGE_BASE_URL}/${cleanImagePath(post.image || '')}')`
-                  }}
-                ></div>
-
-                <div className="relative z-10 bg-white px-6 pt-4 pb-6 rounded-b-xl transition-colors duration-300 group-hover:bg-white/80">
+                <div className="p-5 bg-white">
                   <span className="uppercase text-[13px] tracking-[2px] font-medium text-gray-500">
                     Project
                   </span>
-                  <h3 className="mt-1 mb-2 font-serif text-lg font-semibold truncate max-w-[200px]">
+                  <h3 className="mt-1 mb-2 font-serif text-lg font-semibold truncate">
                     {post.title}
                   </h3>
                   <span className="text-xs font-medium text-gray-700">
@@ -105,7 +102,7 @@ const ProjectViewPage = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="text-blue-600 text-xs hover:underline break-words"
+                        className="text-blue-600 text-xs hover:underline break-all"
                       >
                         GitHub Link
                       </a>
@@ -116,7 +113,7 @@ const ProjectViewPage = () => {
             ))}
           </section>
 
-          <div className="flex justify-center gap-2 mt-6">
+          <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage <= 1}
@@ -132,14 +129,14 @@ const ProjectViewPage = () => {
                   onClick={() => handlePageChange(page)}
                   className={`px-4 py-2 rounded transition-all duration-200 ${
                     page === currentPage
-                      ? 'bg-orange-400 text-white'
+                      ? 'bg-orange-500 text-white'
                       : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                 >
                   {page}
                 </button>
               ) : (
-                <span key={`ellipsis-${idx}`} className="px-2 py-2 select-none">
+                <span key={`ellipsis-${idx}`} className="px-2 py-2 select-none text-gray-500">
                   {page}
                 </span>
               )

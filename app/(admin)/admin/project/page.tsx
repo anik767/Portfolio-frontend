@@ -112,7 +112,7 @@ const ProjectListPage: React.FC = () => {
   };
 
   return (
-    <main className="max-w-5xl mx-auto p-5 font-cursive">
+    <main className=" mx-auto p-5 font-cursive">
       {/* Projects Container with glassmorphism style */}
       <section className="relative p-6 mt-8 border-[2px] border-black/20 bg-white/20 backdrop-blur-[4px] rounded shadow text-black w-full mx-auto">
         <div className="flex justify-between items-center mb-6">

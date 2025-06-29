@@ -1,25 +1,22 @@
 "use client";
 
 import Adminnav from "../component/adminnav";
-import AdminFooter from "../component/adminfooter";
+import Admintop from "../component/admintop";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Get login param as a string to use in effect dependencies
   const loginStatus = searchParams.get("login");
 
   useEffect(() => {
     if (loginStatus === "success") {
       toast.success("Login successful!");
-
-      // Remove the query param from URL so toast doesn't repeat on refresh
-      // This won't reload page, just change URL using replace
       const url = new URL(window.location.href);
       url.searchParams.delete("login");
       router.replace(url.pathname + url.search, { scroll: false });
@@ -28,9 +25,27 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <Adminnav />
-      <main>{children}</main>
-      <AdminFooter />
+      <div className="flex min-h-screen">
+        {/* Sidebar */}
+        <Adminnav sidebarOpen={sidebarOpen} />
+
+        {/* Main content */}
+        <div
+          className={`
+            flex-grow transition-all duration-500
+            ${sidebarOpen ? "ml-64" : "ml-0"}
+          `}
+        >
+          <Admintop
+            sidebarOpen={sidebarOpen}
+            toggleSidebar={() => setSidebarOpen((prev) => !prev)}
+          />
+          <main className=" bg-gray-50 min-h-[calc(100vh-56px)] overflow-auto mt-[40px] p-[20px]">
+            {children}
+          </main>
+        </div>
+      </div>
+
       <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
