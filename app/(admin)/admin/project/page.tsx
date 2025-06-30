@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import ConfirmModal from '../../../component/ConfirmModal';
 import { apiFetch } from '../../../utils/apiClient';
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {  useEffect ,useState  } from 'react';
 interface Project {
   id: number;
   title: string;
@@ -22,7 +24,9 @@ interface PaginatedResponse {
   prev_page_url: string | null;
 }
 
+
 const ProjectListPage: React.FC = () => {
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -39,13 +43,17 @@ const ProjectListPage: React.FC = () => {
       setCurrentPage(data.current_page ?? 1);
       setLastPage(data.last_page ?? 1);
     } catch (e) {
-      setError((e as Error)?.message ?? 'Failed to load projects');
+      const message = (e as Error)?.message ?? 'Failed to load projects';
+      setError(message);
+      toast.error(message);
     }
   };
 
   useEffect(() => {
-    loadProjects();
-  }, []);
+    loadProjects(currentPage);
+  }, [currentPage]);
+
+
 
   const confirmDelete = (id: number) => {
     setSelectedDeleteId(id);
@@ -60,9 +68,13 @@ const ProjectListPage: React.FC = () => {
 
     try {
       await apiFetch(`/admin/project-posts/${selectedDeleteId}`, { method: 'DELETE' });
+      toast.success('Project deleted successfully!');
+      // Reload projects, reset page if current page empty after deletion (optional)
       await loadProjects(currentPage);
     } catch (e) {
-      setError((e as Error)?.message ?? 'Failed to delete project');
+      const message = (e as Error)?.message ?? 'Failed to delete project';
+      setError(message);
+      toast.error(message);
     } finally {
       setDeletingId(null);
       setSelectedDeleteId(null);
@@ -71,11 +83,12 @@ const ProjectListPage: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= lastPage && page !== currentPage) {
-      loadProjects(page);
+      setCurrentPage(page);
+      // loadProjects(page); -- no need, useEffect triggers loadProjects on currentPage change
     }
   };
 
-  // Helper to generate page numbers with ellipsis
+  // Pagination helper with ellipsis
   const getPageNumbers = (): (number | string)[] => {
     const pages: (number | string)[] = [];
     const maxVisiblePages = 4;
@@ -112,147 +125,144 @@ const ProjectListPage: React.FC = () => {
   };
 
   return (
-    <main className=" mx-auto p-5 font-cursive">
-      {/* Projects Container with glassmorphism style */}
-      <section className="relative p-6 mt-8 border-[2px] border-black/20 bg-white/20 backdrop-blur-[4px] rounded shadow text-black w-full mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-semibold rajdhani">Projects</h2>
-          <Link href="/admin/project/new_project">
-            <button
-              className="bg-green-500 hover:bg-green-600 shadow-[#959da5]/30 shadow-[0px_8px_24px] rajdhani text-white px-4 py-2 rounded"
-              aria-label="Create New Project"
-            >
-              + Create New Project
-            </button>
-          </Link>
-        </div>
+    <>
+      <main className="mx-auto p-5 max-w-5xl font-cursive">
+        <section className="relative p-6 mt-8 border-[2px] border-black/20 bg-white/20 backdrop-blur-[4px] rounded shadow text-black w-full mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-semibold rajdhani">Projects</h2>
+            <Link href="/admin/project/new_project" passHref>
+              <button
+                className="bg-green-500 hover:bg-green-600 shadow-[#959da5]/30 shadow-[0px_8px_24px] rajdhani text-white px-4 py-2 rounded"
+                aria-label="Create New Project"
+              >
+                + Create New Project
+              </button>
+            </Link>
+          </div>
 
-        {error && (
-          <p className="mb-4 text-red-600 font-semibold" role="alert" aria-live="assertive">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="mb-4 text-red-600 font-semibold" role="alert" aria-live="assertive">
+              {error}
+            </p>
+          )}
 
-        {projects.length === 0 ? (
-          <p className="text-center text-gray-700">No projects found.</p>
-        ) : (
-          <>
-            <ul className="space-y-3 pb-12">
-              {projects.map((project) => (
-                <li
-                  key={project.id}
-                  className="border border-white/20 p-3 rounded flex justify-between items-center shadow-[#959da5]/30 shadow-[0px_8px_24px]"
-                >
-                  <article className="max-w-[75%] flex items-center gap-4">
-                    {project.image_url && (
-                      <Image
-                        src={project.image_url}
-                        alt={project.title || 'Project image'}
-                        className="w-[150px] h-[50px] rounded-[10px] object-cover"
-                        unoptimized
-                        width={150}
-                        height={50}
-                      />
-                    )}
-                    <div className="flex gap-3 items-center">
-                      <h3 className="Epilogue font-[400] truncate w-[200px] overflow-hidden whitespace-nowrap">
-                        {project.title || 'Untitled Project'}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {new Date(project.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </article>
+          {projects.length === 0 ? (
+            <p className="text-center text-gray-700">No projects found.</p>
+          ) : (
+            <>
+              <ul className="space-y-3 pb-12">
+                {projects.map((project) => (
+                  <li
+                    key={project.id}
+                    className="border border-white/20 p-3 rounded flex justify-between items-center shadow-[#959da5]/30 shadow-[0px_8px_24px]"
+                  >
+                    <article className="max-w-[75%] flex items-center gap-4">
+                      {project.image_url && (
+                        <Image
+                          src={project.image_url}
+                          alt={project.title || 'Project image'}
+                          className="w-[150px] h-[50px] rounded-[10px] object-cover"
+                          unoptimized
+                          width={150}
+                          height={50}
+                        />
+                      )}
+                      <div className="flex gap-3 items-center">
+                        <h3 className="Epilogue font-[400] truncate w-[200px] overflow-hidden whitespace-nowrap">
+                          {project.title || 'Untitled Project'}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {new Date(project.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </article>
 
-                  <div className="flex space-x-2 flex-shrink-0">
-                    <Link href={`/admin/project/${project.id}`}>
+                    <div className="flex space-x-2 flex-shrink-0">
+                      <Link href={`/admin/project/${project.id}`} passHref>
+                        <button
+                          className="rajdhani bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px]"
+                          disabled={deletingId === project.id}
+                          aria-label={`Edit project ${project.title || project.id}`}
+                        >
+                          Edit
+                        </button>
+                      </Link>
                       <button
-                        className="rajdhani bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px]"
+                        onClick={() => confirmDelete(project.id)}
+                        className={`rajdhani bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px] ${deletingId === project.id ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                         disabled={deletingId === project.id}
-                        aria-label={`Edit project ${project.title || project.id}`}
+                        aria-label={`Delete project ${project.title || project.id}`}
                       >
-                        Edit
+                        {deletingId === project.id ? 'Deleting...' : 'Delete'}
                       </button>
-                    </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Pagination */}
+              <nav
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-2"
+                role="navigation"
+                aria-label="Pagination Navigation"
+              >
+                <button
+                  type="button"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  aria-label="Previous page"
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer focus:outline-none"
+                >
+                  Previous
+                </button>
+
+                {getPageNumbers().map((page, idx) =>
+                  typeof page === 'number' ? (
                     <button
-                      onClick={() => confirmDelete(project.id)}
-                      className={`rajdhani bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow-[#959da5]/30 shadow-[0px_8px_24px] ${
-                        deletingId === project.id ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                      disabled={deletingId === project.id}
-                      aria-label={`Delete project ${project.title || project.id}`}
+                      key={`${page}-${idx}`}
+                      type="button"
+                      onClick={() => handlePageChange(page)}
+                      className={`px-4 py-2 rounded cursor-pointer focus:outline-none ${page === currentPage
+                          ? 'bg-orange-400 text-white'
+                          : 'bg-gray-300 shadow-[1.95px_1.95px_2.6px_rgba(149,157,165,0.3)]'
+                        }`}
+                      aria-current={page === currentPage ? 'page' : undefined}
+                      aria-label={`Go to page ${page}`}
                     >
-                      {deletingId === project.id ? 'Deleting...' : 'Delete'}
+                      {page}
                     </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  ) : (
+                    <span key={`ellipsis-${idx}`} className="px-3 py-2 select-none" aria-hidden="true">
+                      {page}
+                    </span>
+                  )
+                )}
 
-            {/* Advanced Pagination */}
-            <nav
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-2"
-              role="navigation"
-              aria-label="Pagination Navigation"
-            >
-              <button
-                type="button"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage <= 1}
-                aria-label="Previous page"
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer focus:outline-none  "
-              >
-                Previous
-              </button>
+                <button
+                  type="button"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= lastPage}
+                  aria-label="Next page"
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer focus:outline-none"
+                >
+                  Next
+                </button>
+              </nav>
+            </>
+          )}
+        </section>
+      </main>
 
-              {getPageNumbers().map((page, idx) =>
-                typeof page === 'number' ? (
-                  <button
-                    key={`${page}-${idx}`}
-                    type="button"
-                    onClick={() => handlePageChange(page)}
-                    className={`px-4 py-2 rounded cursor-pointer focus:outline-none   ${
-                      page === currentPage
-                        ? 'bg-orange-400 text-white'
-                        : 'bg-gray-300 shadow-[1.95px_1.95px_2.6px_rgba(149,157,165,0.3)]'
-                    }`}
-                    aria-current={page === currentPage ? 'page' : undefined}
-                    aria-label={`Go to page ${page}`}
-                  >
-                    {page}
-                  </button>
-                ) : (
-                  <span
-                    key={`ellipsis-${idx}`}
-                    className="px-3 py-2 select-none"
-                    aria-hidden="true"
-                  >
-                    {page}
-                  </span>
-                )
-              )}
-
-              <button
-                type="button"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage >= lastPage}
-                aria-label="Next page"
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 cursor-pointer focus:outline-none"
-              >
-                Next
-              </button>
-            </nav>
-          </>
-        )}
-      </section>
-
+      {/* Confirm Modal component */}
       <ConfirmModal
         isOpen={showModal}
         onCancel={() => setShowModal(false)}
         onConfirm={handleDeleteConfirmed}
         message="Are you sure you want to delete this project?"
       />
-    </main>
+
+    </>
   );
 };
 

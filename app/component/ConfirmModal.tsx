@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React from 'react';
 
 interface ConfirmModalProps {
@@ -23,7 +24,15 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, message, onConfirm,
         className="bg-white p-6 rounded shadow-md w-[90%] max-w-md"
         onClick={(e) => e.stopPropagation()} // prevent overlay click when clicking inside modal
       >
+        
         <p className="text-lg mb-4">{message}</p>
+        <Image
+          width={300}
+          height={200}
+          src="/Image/confurm.png"
+          alt="Warning"
+          className='mx-auto mb-8'
+        />
         <div className="flex justify-end space-x-4">
           <button
             onClick={onCancel}

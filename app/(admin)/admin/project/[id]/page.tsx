@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { apiFetch } from '../../../../utils/apiClient';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Project {
@@ -38,9 +38,7 @@ export default function EditProjectPage() {
 
     apiFetch(`/admin/project-posts/${id}`)
       .then(data => {
-        // Adjust if your API returns { data: {...} }
         const p: Project = data.data || data;
-
         setProject(p);
         setTitle(p.title);
         setContent(p.content);
@@ -54,10 +52,10 @@ export default function EditProjectPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Revoke previous object URL on previewUrl change or component unmount
+  // Cleanup old object URLs when previewUrl changes or component unmounts
   useEffect(() => {
     return () => {
-      if (previewUrl) {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(previewUrl);
       }
     };
@@ -65,6 +63,12 @@ export default function EditProjectPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+
+    // Revoke previous preview URL if it was a blob URL
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
     setImageFile(file);
 
     if (file) {
@@ -78,9 +82,9 @@ export default function EditProjectPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-  
+
     setSaving(true);
-  
+
     try {
       const formData = new FormData();
       formData.append('title', title);
@@ -88,22 +92,21 @@ export default function EditProjectPage() {
       formData.append('git_url', git_url);
       formData.append('project_url', project_url);
       if (imageFile) formData.append('image', imageFile);
-      formData.append('_method', 'PUT'); // Add this for method override
-  
+      formData.append('_method', 'PUT');
+
       await apiFetch(`/admin/project-posts/${id}`, {
-        method: 'POST', // Use POST, Laravel will treat as PUT because of _method
+        method: 'POST',
         body: formData,
       });
-  
+
       toast.success('Project updated successfully!');
-      router.push('/admin/project');
-    } catch (err) {
-      toast.error(`Error saving project: ${(err as Error).message}`);
+      router.push('/admin/project?updated=1');
+    } catch (err: any) {
+      toast.error(`Error saving project: ${err.message}`);
     } finally {
       setSaving(false);
     }
   };
-  
 
   if (loading) return <div className="p-5 text-center">Loading…</div>;
   if (!project) return <div className="p-5">Project not found.</div>;
@@ -113,9 +116,17 @@ export default function EditProjectPage() {
       <main className="max-w-xl mx-auto p-5">
         <h1 className="text-2xl mb-6">Edit Project #{id}</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          encType="multipart/form-data"
+          aria-busy={saving}
+          aria-live="polite"
+        >
           <div>
-            <label htmlFor="title" className="block font-semibold mb-1">Title</label>
+            <label htmlFor="title" className="block font-semibold mb-1">
+              Title
+            </label>
             <input
               id="title"
               type="text"
@@ -123,12 +134,14 @@ export default function EditProjectPage() {
               value={title}
               onChange={e => setTitle(e.target.value)}
               required
-              disabled={saving}
+              disabled={saving || loading}
             />
           </div>
 
           <div>
-            <label htmlFor="content" className="block font-semibold mb-1">Content</label>
+            <label htmlFor="content" className="block font-semibold mb-1">
+              Content
+            </label>
             <textarea
               id="content"
               rows={6}
@@ -136,45 +149,49 @@ export default function EditProjectPage() {
               value={content}
               onChange={e => setContent(e.target.value)}
               required
-              disabled={saving}
+              disabled={saving || loading}
             />
           </div>
 
           <div>
-            <label htmlFor="git_url" className="block font-semibold mb-1">Git URL</label>
+            <label htmlFor="git_url" className="block font-semibold mb-1">
+              Git URL
+            </label>
             <input
               id="git_url"
               type="url"
               className="w-full border rounded px-3 py-2"
               value={git_url}
               onChange={e => setGitUrl(e.target.value)}
-              required
-              disabled={saving}
+              disabled={saving || loading}
             />
           </div>
 
           <div>
-            <label htmlFor="project_url" className="block font-semibold mb-1">Project URL</label>
+            <label htmlFor="project_url" className="block font-semibold mb-1">
+              Project URL
+            </label>
             <input
               id="project_url"
               type="url"
               className="w-full border rounded px-3 py-2"
               value={project_url}
               onChange={e => setProjectUrl(e.target.value)}
-              required
-              disabled={saving}
+              disabled={saving || loading}
             />
           </div>
 
           <div>
-            <label htmlFor="image" className="block font-semibold mb-1">Change Image</label>
+            <label htmlFor="image" className="block font-semibold mb-1">
+              Change Image
+            </label>
             <input
               id="image"
               type="file"
               accept="image/*"
               className="w-full"
               onChange={handleImageChange}
-              disabled={saving}
+              disabled={saving || loading}
             />
             {previewUrl && (
               <Image
@@ -190,14 +207,13 @@ export default function EditProjectPage() {
 
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || loading}
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
       </main>
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

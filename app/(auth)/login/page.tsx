@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 
@@ -24,7 +24,6 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   useEffect(() => {
-    // Check if already logged in
     async function checkAuth() {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user`, {
@@ -38,13 +37,12 @@ export default function LoginPage() {
         // Not authenticated
       }
 
-      // Restore saved email and password if "Remember me" was checked
       const savedEmail = localStorage.getItem('rememberedEmail');
       const savedPasswordEncoded = localStorage.getItem('rememberedPassword');
 
       if (savedEmail && savedPasswordEncoded) {
         setEmail(savedEmail);
-        setPassword(atob(savedPasswordEncoded)); // decode password
+        setPassword(atob(savedPasswordEncoded));
         setRememberMe(true);
       } else if (savedEmail) {
         setEmail(savedEmail);
@@ -74,7 +72,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Get CSRF cookie from backend (Laravel Sanctum)
       const csrfRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sanctum/csrf-cookie`, {
         credentials: 'include',
       });
@@ -82,7 +79,6 @@ export default function LoginPage() {
 
       const csrfToken = getCookie('XSRF-TOKEN');
 
-      // Login request
       const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: 'POST',
         headers: {
@@ -98,7 +94,6 @@ export default function LoginPage() {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Confirm user info after login
       const userRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user`, {
         credentials: 'include',
       });
@@ -107,10 +102,9 @@ export default function LoginPage() {
         throw new Error('Failed to fetch user info after login');
       }
 
-      // Save email and password (encoded) if "Remember Me" is checked
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
-        localStorage.setItem('rememberedPassword', btoa(password)); // encode password
+        localStorage.setItem('rememberedPassword', btoa(password));
       } else {
         localStorage.removeItem('rememberedEmail');
         localStorage.removeItem('rememberedPassword');
@@ -118,7 +112,6 @@ export default function LoginPage() {
 
       toast.success('Login successful!');
       router.push('/admin?login=success');
-      ;
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong');
       setPassword('');
@@ -229,7 +222,14 @@ export default function LoginPage() {
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>
-            <Link rel="stylesheet" href="/" >Back to Home Page</Link>
+
+            <Link
+              href="/"
+              className="text-sm text-blue-700 hover:underline inline-block mt-3"
+            >
+              Back to Home Page
+            </Link>
+
           </form>
         </div>
 
@@ -241,7 +241,6 @@ export default function LoginPage() {
           />
         </div>
       </div>
-      <ToastContainer position="top-right" autoClose={3000} />
     </section>
   );
 }
