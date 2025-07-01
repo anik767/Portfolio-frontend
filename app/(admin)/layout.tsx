@@ -1,6 +1,6 @@
 'use client';
 
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 
 import Adminnav from '../component/adminnav';
 import Admintop from '../component/admintop';
@@ -11,7 +11,7 @@ interface AdminLayoutProps {
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
+
   return (
     <>
       <div className="flex min-h-screen">
