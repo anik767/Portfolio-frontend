@@ -8,7 +8,7 @@ export const metadata = {
   description: 'Welcome to my website',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }) {
   return (
     
       <main>

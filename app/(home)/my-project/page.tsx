@@ -18,7 +18,7 @@ const ProjectViewPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ;
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/project-posts?page=${currentPage}`)
@@ -27,7 +27,7 @@ const ProjectViewPage = () => {
         setPosts(data.data || []);
         setTotalPages(data.last_page || 1);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -86,9 +86,13 @@ const ProjectViewPage = () => {
                   <span className="uppercase text-[13px] tracking-[2px] font-medium text-gray-500">
                     Project
                   </span>
-                  <h3 className="mt-1 mb-2 font-serif text-lg font-semibold truncate">
+                  <h3 className="mt-1 mb-2 font-serif text-lg font-semibold ">
                     {post.title}
                   </h3>
+                  <p className="mt-1 mb-2 font-serif text-sm font-semibold line-clamp-3 text-justify">
+                    {post.content}
+                  </p>
+
                   <span className="text-xs font-medium text-gray-700">
                     Published on:{' '}
                     <span className="text-[#AD7D52] font-semibold">
@@ -127,11 +131,10 @@ const ProjectViewPage = () => {
                 <button
                   key={`${page}-${idx}`}
                   onClick={() => handlePageChange(page)}
-                  className={`px-4 py-2 rounded transition-all duration-200 ${
-                    page === currentPage
+                  className={`px-4 py-2 rounded transition-all duration-200 ${page === currentPage
                       ? 'bg-orange-500 text-white'
                       : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

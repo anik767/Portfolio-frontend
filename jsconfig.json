@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": ".",                // Root of the project
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"]               // So '@/utils/apiClient' → './utils/apiClient'
     }
-  }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules"]
 }
