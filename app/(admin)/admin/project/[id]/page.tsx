@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { apiFetch } from '../../../../utils/apiClient';
@@ -31,10 +31,10 @@ export default function EditProjectPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (!id) return;
-
-    setLoading(true);
 
     apiFetch(`/admin/project-posts/${id}`)
       .then(data => {
@@ -52,31 +52,44 @@ export default function EditProjectPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Cleanup old object URLs when previewUrl changes or component unmounts
   useEffect(() => {
     return () => {
-      if (previewUrl && previewUrl.startsWith('blob:')) {
+      if (previewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(previewUrl);
       }
     };
   }, [previewUrl]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-
-    // Revoke previous preview URL if it was a blob URL
-    if (previewUrl && previewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrl);
+  const handleFile = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image.');
+      return;
     }
-
     setImageFile(file);
+    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(URL.createObjectURL(file));
+  }, [previewUrl]);
 
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-    } else {
-      setPreviewUrl(null);
-    }
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const handleClick = () => {
+    if (!saving) fileInputRef.current?.click();
+  };
+
+  const handleCancelImage = () => {
+    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
+    setImageFile(null);
+    setPreviewUrl(project?.image_url || null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,7 +97,6 @@ export default function EditProjectPage() {
     if (!id) return;
 
     setSaving(true);
-
     try {
       const formData = new FormData();
       formData.append('title', title);
@@ -112,108 +124,144 @@ export default function EditProjectPage() {
   if (!project) return <div className="p-5">Project not found.</div>;
 
   return (
-    <>
-      <main className="max-w-xl mx-auto p-5">
-        <h1 className="text-2xl mb-6">Edit Project #{id}</h1>
+    <main className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-10">
+      <h1 className="text-3xl font-semibold mb-8 text-center">Edit Project #{id}</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-          encType="multipart/form-data"
-          aria-busy={saving}
-          aria-live="polite"
-        >
-          <div>
-            <label htmlFor="title" className="block font-semibold mb-1">
-              Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              className="w-full border rounded px-3 py-2"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              required
-              disabled={saving || loading}
-            />
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8"
+        encType="multipart/form-data"
+        noValidate
+        aria-busy={saving}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="title" className="block text-lg font-medium mb-2">
+                Title
+              </label>
+              <input
+                id="title"
+                type="text"
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-blue-500 focus:outline-none"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="git_url" className="block text-lg font-medium mb-2">
+                Git URL
+              </label>
+              <input
+                id="git_url"
+                type="url"
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-blue-500 focus:outline-none"
+                value={git_url}
+                onChange={(e) => setGitUrl(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="project_url" className="block text-lg font-medium mb-2">
+                Project URL
+              </label>
+              <input
+                id="project_url"
+                type="url"
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-blue-500 focus:outline-none"
+                value={project_url}
+                onChange={(e) => setProjectUrl(e.target.value)}
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="content" className="block text-lg font-medium mb-2">
+                Content
+              </label>
+              <textarea
+                id="content"
+                rows={5}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 resize-none focus:ring-blue-500 focus:outline-none"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                disabled={saving}
+              />
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="content" className="block font-semibold mb-1">
-              Content
-            </label>
-            <textarea
-              id="content"
-              rows={6}
-              className="w-full border rounded px-3 py-2"
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              required
-              disabled={saving || loading}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="git_url" className="block font-semibold mb-1">
-              Git URL
-            </label>
+          <div
+            className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors flex flex-col justify-center
+              ${saving ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-600'}`}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={handleClick}
+            tabIndex={0}
+            role="button"
+            aria-disabled={saving}
+            onKeyDown={(e) => {
+              if (!saving && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                handleClick();
+              }
+            }}
+          >
+            {previewUrl ? (
+              <div className="mx-auto w-full rounded-lg overflow-hidden border border-gray-300 shadow relative">
+                <Image
+                  src={previewUrl}
+                  alt={`Preview for ${title || 'project image'}`}
+                  width={400}
+                  height={220}
+                  className="object-cover w-full h-auto"
+                  unoptimized
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCancelImage();
+                  }}
+                  disabled={saving}
+                  className="absolute top-2 right-2 bg-red-600 text-white rounded px-3 py-1 text-sm hover:bg-red-700"
+                  aria-label="Cancel image upload"
+                >
+                  ✕
+                </button>
+                <p className="mt-3 text-sm text-gray-600 select-none">
+                  Click or drag & drop to change image
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-500 select-none text-lg">
+                Drag & drop an image here, or click to select a file
+              </p>
+            )}
             <input
-              id="git_url"
-              type="url"
-              className="w-full border rounded px-3 py-2"
-              value={git_url}
-              onChange={e => setGitUrl(e.target.value)}
-              disabled={saving || loading}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="project_url" className="block font-semibold mb-1">
-              Project URL
-            </label>
-            <input
-              id="project_url"
-              type="url"
-              className="w-full border rounded px-3 py-2"
-              value={project_url}
-              onChange={e => setProjectUrl(e.target.value)}
-              disabled={saving || loading}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="image" className="block font-semibold mb-1">
-              Change Image
-            </label>
-            <input
+              ref={fileInputRef}
               id="image"
               type="file"
               accept="image/*"
-              className="w-full"
               onChange={handleImageChange}
-              disabled={saving || loading}
+              disabled={saving}
+              className="hidden"
             />
-            {previewUrl && (
-              <Image
-                src={previewUrl}
-                alt={`Preview for ${title || 'project image'}`}
-                width={500}
-                height={100}
-                className="mt-2 w-[50%] rounded"
-                unoptimized
-              />
-            )}
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={saving || loading}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </form>
-      </main>
-    </>
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full bg-green-600 text-white font-semibold py-3 rounded-md hover:bg-green-700 disabled:opacity-50 transition"
+        >
+          {saving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </form>
+    </main>
   );
 }

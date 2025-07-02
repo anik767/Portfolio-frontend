@@ -1,13 +1,10 @@
-"use client";
-
 // (auth)/layout.tsx
-import React, { ReactNode } from 'react';
+'use client';
 
+interface AuthLayoutProps {
+  children: React.ReactNode;
+}
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      {children}
-    </div>
-  );
+export default function AuthLayout({ children }: AuthLayoutProps) {
+  return <>{children}</>;
 }
