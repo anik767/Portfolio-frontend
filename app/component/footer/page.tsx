@@ -181,7 +181,7 @@ const Footer = () => {
 
         {/* Contact Form */}
         <div>
-          <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
+          <h2 className="text-2xl font-bold mb-4">Get In Touch</h2>
           <form onSubmit={handleSubmit} className="space-y-2">
             <input
               type="text"
@@ -215,7 +215,7 @@ const Footer = () => {
               className="bg-blue-600 hover:bg-blue-700 transition-colors px-6 py-3 rounded text-white font-semibold disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? 'Sending...' : 'Send Message'}
+              {loading ? 'Sending...' : 'Submit Now'}
             </button>
             <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
           </form>

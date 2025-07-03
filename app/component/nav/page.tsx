@@ -27,7 +27,7 @@ const Nav: React.FC = () => {
   return (
     <header
   className={`fixed top-5 left-0 w-full h-[5vh] z-50 transition-transform duration-200 ${
-    isVisible ? 'translate-y-0' : '-translate-y-16'
+    isVisible ? 'translate-y-0' : '-translate-y-24'
   }`}
 >
   <nav className="  max-w-5xl mx-auto flex justify-center rajdhani">

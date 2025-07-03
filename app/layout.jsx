@@ -8,7 +8,7 @@ const ToastContainer = dynamic(() => import('react-toastify').then(mod => mod.To
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body className=''>
         {children}
         <ToastContainer
            position="top-right"

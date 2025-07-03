@@ -10,9 +10,9 @@ export const metadata = {
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
   return (
     
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col">
         <Navbar />
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow min-h-[100vh]">{children}</main>
         <Footer />
       </div>
    
