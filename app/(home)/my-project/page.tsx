@@ -58,26 +58,26 @@ const ProjectViewPage = () => {
   };
 
   return (
-    <div className='bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white pt-24 min-h-[100vh]'>
-    <p className="text-pink-500 uppercase tracking-widest text-sm font-semibold flex items-center justify-center ">
-          My Background
-        </p>
-      <div className="container mx-auto p-5 font-cursive relative ">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-center">Recent Projects</h1>
+    <div className='bg-gradient-to-br from-[#222121] via-[#2b2b2b] to-[#1c1b1b] text-white pt-24 min-h-[100vh]'>
+      <p className="text-[#59C378] uppercase tracking-widest text-sm font-semibold flex items-center justify-center">
+        My Background
+      </p>
+      <div className="container mx-auto p-5 font-cursive relative">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-center text-white">Recent Projects</h1>
 
         {posts.length === 0 ? (
-          <p className="text-center text-gray-600">No posts to display.</p>
+          <p className="text-center text-white/60">No posts to display.</p>
         ) : (
           <>
             <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-2 py-4">
               {posts.map((post) => (
                 <article
-                  key={post.id}
-                  className="group relative bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-pink-500/30 transition-all duration-300 cursor-pointer"
-                  onClick={() => window.open(post.project_url, '_blank')}
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && window.open(post.project_url, '_blank')}
-                >
+                key={post.id}
+                className="group relative rounded-2xl overflow-hidden bg-[#1e1e1e]/80 border border-white/10 shadow-md hover:shadow-[#59C378]/40  transition-all duration-300 cursor-pointer backdrop-blur"
+                onClick={() => window.open(post.project_url, '_blank')}
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && window.open(post.project_url, '_blank')}
+              >
                   <div className="relative w-full h-[235px] overflow-hidden">
                     <img
                       src={post.image_url || '/fallback.jpg'}
@@ -86,18 +86,18 @@ const ProjectViewPage = () => {
                     />
                   </div>
 
-                  <div className="p-5 bg-gray-900 text-white space-y-2">
-                    <span className="uppercase text-[13px] tracking-[2px] font-medium text-pink-400">
+                  <div className="p-5  text-white space-y-2">
+                    <span className="uppercase text-[13px] tracking-[2px] font-medium text-[#59C378]">
                       Project
                     </span>
                     <h3 className="text-lg font-semibold">{post.title}</h3>
-                    <p className="text-sm text-gray-300 font-light line-clamp-3 text-justify">
+                    <p className="text-sm text-white/70 font-light line-clamp-3 text-justify">
                       {post.content}
                     </p>
 
-                    <span className="text-xs font-medium text-gray-400 block">
+                    <span className="text-xs font-medium text-white/60 block">
                       Published on:{' '}
-                      <span className="text-pink-300 font-semibold">
+                      <span className="text-[#59C378] font-semibold">
                         {new Date(post.created_at).toLocaleDateString()}
                       </span>
                     </span>
@@ -109,23 +109,24 @@ const ProjectViewPage = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-pink-400 text-xs hover:underline break-all"
+                          className="text-[#59C378] text-xs hover:underline break-all"
                         >
                           GitHub Link
                         </a>
                       </div>
                     )}
                   </div>
+
+                  <div className=" absolute bottom-0 right-0 w-32 h-32 rounded-full bg-[#59C378] blur-[120px] z-0"/>
                 </article>
               ))}
             </section>
-
 
             <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage <= 1}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 rounded bg-white/10 text-white hover:bg-[#59C378]/20 disabled:opacity-40"
               >
                 Previous
               </button>
@@ -136,14 +137,14 @@ const ProjectViewPage = () => {
                     key={`${page}-${idx}`}
                     onClick={() => handlePageChange(page)}
                     className={`px-4 py-2 rounded transition-all duration-200 ${page === currentPage
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-gray-300 hover:bg-gray-400'
+                      ? 'bg-[#59C378] text-white'
+                      : 'bg-white/10 text-white hover:bg-white/20'
                       }`}
                   >
                     {page}
                   </button>
                 ) : (
-                  <span key={`ellipsis-${idx}`} className="px-2 py-2 select-none text-gray-500">
+                  <span key={`ellipsis-${idx}`} className="px-2 py-2 select-none text-white/50">
                     {page}
                   </span>
                 )
@@ -152,7 +153,7 @@ const ProjectViewPage = () => {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 rounded bg-white/10 text-white hover:bg-[#59C378]/20 disabled:opacity-40"
               >
                 Next
               </button>
@@ -161,7 +162,6 @@ const ProjectViewPage = () => {
         )}
       </div>
     </div>
-
   );
 };
 

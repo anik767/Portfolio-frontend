@@ -1,6 +1,7 @@
+
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white pb-10">
+    <div className="min-h-screen bg-gradient-to-br from-[#222121] via-[#2b2b2b] to-[#1c1b1b] text-[#fff] pb-10">
       <div className="container mx-auto space-y-16">
         {/* Top Section: Image + About Text */}
         <div className="container ">
@@ -14,50 +15,37 @@ export default function About() {
               />
             </div>
             <div className="space-y-6">
-              <p className="text-pink-500 uppercase tracking-widest text-sm font-semibold">
+              <p className="text-[#59C378] uppercase tracking-widest text-sm font-semibold  transition-colors">
                 Visit my portfolio & hire me
               </p>
-              <h2 className="text-4xl font-extrabold text-white">About Me</h2>
+              <h2 className="text-4xl font-extrabold text-[#fff]  transition-colors">About Me</h2>
               <div className="text-gray-300 space-y-4 leading-relaxed">
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eum in eos saepe ipsa cupiditate accusantium
-                  voluptatibus quidem nam, reprehenderit, et necessitatibus adipisci labore sit veritatis vero tempore
-                  sequi at sed facere dolore.
+                <p className=" transition-colors">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eum in eos saepe ipsa cupiditate accusantium voluptatibus quidem nam, reprehenderit, et necessitatibus adipisci labore sit veritatis vero tempore sequi at sed facere dolore.
                 </p>
-                <p>
-                  Quae obcaecati eius quasi doloribus illum minus fugit. Lorem ipsum dolor sit amet, consectetur
-                  adipisicing elit. Eum in eos saepe ipsa cupiditate accusantium voluptatibus quidem nam, reprehenderit.
+                <p className=" transition-colors">
+                  Quae obcaecati eius quasi doloribus illum minus fugit. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eum in eos saepe ipsa cupiditate accusantium voluptatibus quidem nam, reprehenderit.
                 </p>
               </div>
 
               <div className="text-gray-300 space-y-2">
-                <div>
-                  <span className="font-semibold">Name:</span> Jessica Biogi
-                </div>
-                <div>
-                  <span className="font-semibold">Nationality:</span> USA
-                </div>
-                <div>
-                  <span className="font-semibold">Phone:</span> (+1) 234 567 8899
-                </div>
-                <div>
-                  <span className="font-semibold">Email:</span> hello@biogi.com
-                </div>
-                <div>
-                  <span className="font-semibold">Experience:</span> 6+ years
-                </div>
-                <div>
-                  <span className="font-semibold">Freelance:</span> Available
-                </div>
-                <div>
-                  <span className="font-semibold">Skype:</span> hello.biogi
-                </div>
-                <div>
-                  <span className="font-semibold">Language:</span> English
-                </div>
+                {[
+                  ['Name:', 'Jessica Biogi'],
+                  ['Nationality:', 'USA'],
+                  ['Phone:', '(+1) 234 567 8899'],
+                  ['Email:', 'hello@biogi.com'],
+                  ['Experience:', '6+ years'],
+                  ['Freelance:', 'Available'],
+                  ['Skype:', 'hello.biogi'],
+                  ['Language:', 'English'],
+                ].map(([label, value]) => (
+                  <div key={label} className=" transition-colors">
+                    <span className="font-semibold">{label}</span> {value}
+                  </div>
+                ))}
               </div>
 
-              <button className="bg-white text-pink-500 font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-pink-300 transition">
+              <button className="bg-white text-[#2d4634] font-semibold px-6 py-3 rounded-lg shadow-md hover:text-[#59C378] hover:shadow-[#59C378]/50 transition">
                 Download My CV
               </button>
             </div>
@@ -66,30 +54,38 @@ export default function About() {
 
         {/* Who I Am & Tech Stack Section */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-md hover:shadow-blue-500/20 transition">
-            <h2 className="text-2xl font-bold mb-4 text-blue-300 Epilogue">Who I Am</h2>
-            <p className="text-slate-300 text-base leading-loose Poppins">
-              Im a curious and creative problem solver who thrives in dynamic environments. Whether working on
-              frontend UIs or backend logic, I value clean code, efficient workflows, and impactful results. Outside of
-              work, I enjoy reading tech articles, contributing to open-source, and experimenting with side projects.
+          <div className="relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-md hover:shadow-[#59C378]/30 transition overflow-hidden">
+            <h2 className="text-2xl font-bold mb-4 text-[#59C378] Epilogue hover:text-[#fff] transition-colors">Who I Am</h2>
+            <p className="text-slate-300 text-base leading-loose Poppins transition-colors relative z-10">
+              Im a curious and creative problem solver who thrives in dynamic environments. Whether working on frontend UIs or backend logic, I value clean code, efficient workflows, and impactful results. Outside of work, I enjoy reading tech articles, contributing to open-source, and experimenting with side projects.
             </p>
+            <div className=" absolute top-0 right-0 w-32 h-32 rounded-full bg-[#59C378] blur-[75px] z-0"/>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-md hover:shadow-blue-500/20 transition">
-            <h2 className="text-2xl font-bold mb-4 text-blue-300 Epilogue">Tech Stack</h2>
+          <div className="relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-md hover:shadow-[#59C378]/30 transition overflow-hidden">
+            <h2 className="text-2xl font-bold mb-4 text-[#59C378] Epilogue hover:text-[#fff] transition-colors">Tech Stack</h2>
             <ul className="list-disc list-inside text-slate-300 space-y-2 Poppins">
-              <li>⚛️ React & Next.js for frontend frameworks</li>
-              <li>🛠️ Laravel & REST APIs for backend systems</li>
-              <li>🎨 Tailwind CSS for modern UI design</li>
-              <li>🔒 Secure Authentication & Role Management</li>
-              <li>🚀 CI/CD & Hosting with Vercel, Netlify, and cPanel</li>
+              {[
+                '⚛️ React & Next.js for frontend frameworks',
+                '🛠️ Laravel & REST APIs for backend systems',
+                '🎨 Tailwind CSS for modern UI design',
+                '🔒 Secure Authentication & Role Management',
+                '🚀 CI/CD & Hosting with Vercel, Netlify, and cPanel',
+              ].map((item) => (
+                <li key={item} className="transition-colors">{item}</li>
+              ))}
             </ul>
+
+            <div className=" absolute top-0 right-0 w-32 h-32 rounded-full bg-[#59C378] blur-[75px] z-0"/>
+
           </div>
         </section>
 
+
+
         {/* What I Offer Section */}
         <section className="text-center space-y-8">
-          <h2 className="text-3xl font-bold text-blue-300 Epilogue">What I Offer</h2>
+          <h2 className="text-3xl font-bold text-[#59C378] Epilogue  transition-colors">What I Offer</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
             {[
               ['Website Design', 'Intuitive and custom designs tailored to your brand identity.'],
@@ -101,10 +97,10 @@ export default function About() {
             ].map(([title, desc]) => (
               <div
                 key={title}
-                className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-xl hover:shadow-blue-500/20 transition"
+                className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-xl hover:shadow-[#59C378]/30 transition"
               >
-                <h3 className="text-xl font-semibold text-blue-200 mb-2 Epilogue">{title}</h3>
-                <p className="text-slate-300 text-sm Poppins">{desc}</p>
+                <h3 className="text-xl font-semibold text-[#59C378] mb-2 Epilogue  transition-colors">{title}</h3>
+                <p className="text-slate-300 text-sm Poppins  transition-colors">{desc}</p>
               </div>
             ))}
           </div>
@@ -112,14 +108,14 @@ export default function About() {
 
         {/* Lets Connect Section */}
         <section className="mt-20 max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4 text-blue-300 Epilogue">Lets Connect</h2>
+          <h2 className="text-3xl font-bold mb-4 text-[#59C378] Epilogue">Lets Connect</h2>
           <p className="text-slate-300 Poppins mb-6">
             Feel free to reach out for collaborations, freelance projects, or just to say hello!
           </p>
 
           <a
             href="mailto:mikejojo@example.com"
-            className="flex justify-center gap-2 mb-4 text-blue-400 hover:underline Poppins"
+            className="flex justify-center gap-2 mb-4 text-[#59C378] hover:underline Poppins"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="currentColor">
               <path d="M4.616 19q-.691 0-1.153-.462T3 17.384V6.616q0-.691.463-1.153T4.615 5h14.77q.69 0 1.152.463T21 6.616v10.769q0 .69-.463 1.153T19.385 19zM20 6.885l-7.552 4.944q-.106.055-.214.093q-.109.037-.234.037t-.234-.037t-.214-.093L4 6.884v10.5q0 .27.173.443t.443.173h14.769q.269 0 .442-.173t.173-.443zM12 11l7.692-5H4.308zM4 6.885v.211v-.811v.034V6v.32v-.052v.828zV18z" />
@@ -133,7 +129,7 @@ export default function About() {
               href="https://github.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex justify-center gap-2 hover:text-blue-400 transition"
+              className="flex justify-center gap-2 hover:text-[#59C378] transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none">
                 <mask id="lineMdGithubLoop0" width={24} height={24} x={0} y={0}>
@@ -167,7 +163,7 @@ export default function About() {
                 <rect width={8} height={4} x={8} y={11} fill="currentColor" mask="url(#lineMdGithubLoop0)">
                   <animate
                     attributeName="y"
-                    dur="10s"
+                    dur="3s"
                     keyTimes="0;0.45;0.46;0.54;0.55;1"
                     repeatCount="indefinite"
                     values="11;11;7;7;11;11"
@@ -182,7 +178,7 @@ export default function About() {
               href="https://linkedin.com/in/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex justify-center gap-2 hover:text-blue-400 transition"
+              className="flex justify-center gap-2 hover:text-[#59C378] transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none">
                 <circle cx={4} cy={4} r={2} fill="currentColor" fillOpacity={0}>
@@ -208,7 +204,7 @@ export default function About() {
               href="https://twitter.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex justify-center gap-2 hover:text-blue-400 transition"
+              className="flex justify-center gap-2 hover:text-[#59C378] transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none">
                 <path
@@ -232,7 +228,7 @@ export default function About() {
               href="https://facebook.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex justify-center gap-2 hover:text-blue-400 transition"
+              className="flex justify-center gap-2 hover:text-[#59C378] transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none">
                 <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={4}>

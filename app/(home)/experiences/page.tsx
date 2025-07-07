@@ -26,28 +26,28 @@ export default function Experiences() {
   ];
 
   return (
-    <section className="px-6 md:px-20 py-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white pt-24 min-h-[100vh]">
+    <section className="px-6 md:px-20 py-16 bg-gradient-to-br from-[#222121] via-[#2b2b2b] to-[#1c1b1b] text-white pt-24 min-h-[100vh]">
       <div className="text-center mb-12">
-        <p className="text-pink-500 uppercase tracking-widest text-sm font-semibold">
+        <p className="text-[#59C378] uppercase tracking-widest text-sm font-semibold">
           My Journey
         </p>
-        <h2 className="text-4xl md:text-5xl font-extrabold">Work Experiences</h2>
-        <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-white">Work Experiences</h2>
+        <p className="mt-4 text-white/60 max-w-2xl mx-auto">
           Over the years, I’ve contributed to various companies, growing with every role and delivering value through code and creativity.
         </p>
       </div>
 
-      <div className="space-y-10 border-l-2 border-pink-500 pl-6 relative">
+      <div className="space-y-10 border-l-2 border-[#59C378] pl-6 relative">
         {experiences.map((exp, index) => (
           <div
             key={index}
-            className="relative group transition duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-500/30 p-4 rounded-lg"
+            className="relative group transition duration-300 transform hover:-translate-y-1 hover:shadow-[#59C378]/30 p-5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10"
           >
-            <div className="absolute -left-[14px] w-6 h-6 bg-pink-500 rounded-full border-4 border-gray-900 transition-all group-hover:scale-110"></div>
-            <div className="mb-1 text-sm text-pink-400 group-hover:text-white transition duration-300">{exp.duration}</div>
-            <h3 className="text-xl font-bold group-hover:text-white transition duration-300">{exp.role}</h3>
-            <p className="text-sm text-gray-400 italic group-hover:text-pink-400 transition duration-300">{exp.company}</p>
-            <p className="mt-2 text-gray-300 group-hover:text-gray-100 transition duration-300">{exp.description}</p>
+            <div className="absolute -left-[14px] w-6 h-6 bg-[#59C378] rounded-full border-4 border-[#1c1b1b] group-hover:scale-110 transition-all"></div>
+            <div className="mb-1 text-sm text-[#59C378] group-hover:text-white transition">{exp.duration}</div>
+            <h3 className="text-xl font-bold group-hover:text-white transition">{exp.role}</h3>
+            <p className="text-sm text-white/60 italic group-hover:text-[#59C378] transition">{exp.company}</p>
+            <p className="mt-2 text-white/80 group-hover:text-white transition">{exp.description}</p>
           </div>
         ))}
       </div>
